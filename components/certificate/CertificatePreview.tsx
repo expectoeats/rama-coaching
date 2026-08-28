@@ -1,19 +1,37 @@
 import { useRef } from "react";
 import { Printer, FileDown } from "lucide-react";
 import type { CertificateData } from "@/types/certificate";
-import { CertificateDocument } from "./CertificateDocument";
+import { ExcellenceCertificate } from "./ExcellenceCertificate";
+import { Marksheet } from "./MarkSheet";
 import { useFitScale } from "@/lib/useFitScale";
+
+const DOC_WIDTH: Record<CertificateData["documentType"], number> = {
+  excellence: 794,
+  marksheet: 794,
+};
+
+const DOC_HEIGHT: Record<CertificateData["documentType"], number> = {
+  excellence: 1123,
+  marksheet: 1123,
+};
 
 export function CertificatePreview({ data }: { data: CertificateData | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const scale = useFitScale(containerRef);
+  const baseWidth = data ? DOC_WIDTH[data.documentType] : 966;
+  const scale = useFitScale(containerRef, baseWidth);
 
   return (
     <section className="preview" aria-label="Certificate preview">
       <div className="preview-toolbar no-print">
         <div className="preview-toolbar-title">
           <span className="preview-toolbar-eyebrow">Live Preview</span>
-          <span className="preview-toolbar-heading">Certificate</span>
+          <span className="preview-toolbar-heading">
+            {data
+              ? data.documentType === "marksheet"
+                ? "Marksheet"
+                : "Certificate of Excellence"
+              : "Document"}
+          </span>
         </div>
         <button
           type="button"
@@ -29,24 +47,28 @@ export function CertificatePreview({ data }: { data: CertificateData | null }) {
       <div className="preview-stage" ref={containerRef}>
         {data ? (
           <div
-            className="cert-scale-wrap"
+            className={`doc-scale-wrap certificate-print-wrapper print-${data.documentType}`}
             style={
               {
                 ["--cert-scale" as string]: scale,
-                width: `calc(794px * var(--cert-scale))`,
-                height: `calc(1123px * var(--cert-scale))`,
+                width: `calc(${baseWidth}px * var(--cert-scale))`,
+                height: `calc(${DOC_HEIGHT[data.documentType]}px * var(--cert-scale))`,
               } as React.CSSProperties
             }
           >
-            <CertificateDocument data={data} />
+            {data.documentType === "marksheet" ? (
+              <Marksheet data={data} />
+            ) : (
+              <ExcellenceCertificate data={data} />
+            )}
           </div>
         ) : (
           <div className="preview-empty">
             <FileDown size={28} strokeWidth={1.4} />
-            <p className="preview-empty-title">No certificate generated yet</p>
+            <p className="preview-empty-title">No document generated yet</p>
             <p className="preview-empty-text">
-              Fill in the student and course details on the left, then click
-              <strong> Generate Certificate</strong> to see the result here.
+              Choose a document type, fill in the details on the left, then click
+              <strong> Generate</strong> to see the result here.
             </p>
           </div>
         )}

@@ -46,11 +46,11 @@ export default function SiteNav() {
             <img
               src="/logo.jpeg"
               alt="Rama Coaching Center Logo"
-              className="w-12 h-12 object-contain"
+              className="w-10 h-10 md:w-12 md:h-12 object-contain"
             />
             <div>
-              <h1 className="text-lg font-bold text-gray-800">Rama Coaching Center</h1>
-              <p className="text-xs text-gray-600">And Computer Education Center</p>
+              <h1 className="text-sm md:text-lg font-semibold md:font-bold text-gray-800">Rama Coaching Center</h1>
+              <p className="text-[10px] md:text-xs text-gray-600">And Computer Education Center</p>
             </div>
           </Link>
 

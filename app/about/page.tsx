@@ -12,7 +12,7 @@ export default function AboutPage() {
 
       {/* Hero Section */}
       <section className="relative py-16 bg-cover bg-center" style={{ backgroundImage: "url('https://lakshaygroupedu.co.in/assets/images/bg3.jpg')" }}>
-        <div className="absolute inset-0 bg-red-700/70" />
+        <div className="absolute inset-0 bg-red-700/40" />
         <div className="relative max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">About Rama Coaching Center</h1>
           <p className="text-xl text-red-100">Empowering Students with Quality Computer Education Since 2016</p>

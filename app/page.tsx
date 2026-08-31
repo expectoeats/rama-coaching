@@ -11,40 +11,30 @@ const COURSES = [
     id: 1,
     title: "RSCIT / Basic Computer Course",
     desc: "Learn fundamental computer skills and operations",
-    tag: "Popular",
-    tagColor: "bg-red-100 text-red-700",
     img: "https://lakshaygroupedu.co.in/img/a215/COURSES/1736NuswVu6kHYQs0Y9.png",
   },
   {
     id: 2,
     title: "Tally Prime Course",
     desc: "Master accounting software for business",
-    tag: "Accounting",
-    tagColor: "bg-blue-100 text-blue-700",
     img: "https://lakshaygroupedu.co.in/img/a215/COURSES/6YMQOiXLQMbDCxJ1504.jpg",
   },
   {
     id: 3,
     title: "Digital Marketing Course",
     desc: "Learn online marketing strategies",
-    tag: "Marketing",
-    tagColor: "bg-green-100 text-green-700",
     img: "https://lakshaygroupedu.co.in/img/a215/COURSES/3dWyZiQ3iUvKf8M1503.jpg",
   },
   {
     id: 4,
     title: "RSCFA Financial Accounting",
     desc: "Advanced financial accounting skills",
-    tag: "Finance",
-    tagColor: "bg-yellow-100 text-yellow-700",
     img: "https://lakshaygroupedu.co.in/img/a215/COURSES/3kBn78NNbVcyS1r1477.jfif",
   },
   {
     id: 5,
     title: "ADCA / DCA Diploma",
     desc: "Comprehensive computer applications diploma",
-    tag: "Diploma",
-    tagColor: "bg-purple-100 text-purple-700",
     img: "https://lakshaygroupedu.co.in/img/a215/COURSES/6plD3i2vEuM1SwP1405.jpg",
   },
 ];
@@ -83,26 +73,26 @@ export default function HomePage() {
       </section>
 
       {/* Be Part of Us */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 sm:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2">
               <img
                 src="https://lakshaygroupedu.co.in/img/a215/CMS/2156zgXAoXRGxKypyfSideImg.png"
                 alt="Be Part of Us"
-                className="w-full h-64 md:h-80 rounded-lg shadow-lg object-cover"
+                className="w-full h-48 md:h-64 lg:h-80 rounded-lg shadow-lg object-cover"
               />
             </div>
             <div className="w-full md:w-1/2">
-              <h2 className="text-4xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-4xl font-semibold sm:font-bold mb-4">
                 <span className="text-red-700">Be Part</span> <span className="text-gray-800">of Us</span>
               </h2>
-              <p className="text-gray-600 text-lg mb-6">
+              <p className="text-gray-600 text-sm sm:text-lg mb-6">
                 Join our mission to provide quality computer education to students across Uttar Pradesh.
                 We are committed to shaping the future of our students with practical skills and industry-relevant knowledge.
               </p>
-              <Link href="/contact" className="inline-flex items-center bg-red-700 hover:bg-red-800 text-white px-8 py-3 rounded-lg font-bold transition-colors">
-                Join Our Community <ArrowRight className="w-5 h-5 ml-2" />
+              <Link href="/contact" className="inline-flex items-center bg-red-700 hover:bg-red-800 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold sm:font-bold transition-colors">
+                Join Our Community <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Link>
             </div>
           </div>
@@ -146,100 +136,100 @@ export default function HomePage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section className="py-12 sm:py-16 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Why Choose Rama Coaching Center?</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <h2 className="text-2xl sm:text-3xl font-semibold sm:font-bold text-center text-gray-800 mb-6 sm:mb-8">Why Choose Rama Coaching Center?</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8 items-stretch">
             {/* Left Side: 2x2 Feature Cards Grid */}
-            <div className="grid grid-cols-2 gap-6 h-full">
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
-                <div className="bg-gradient-to-r from-red-500 to-red-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/07.png" alt="Futuristic Curriculum" className="w-8 h-8 object-contain" />
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 h-full">
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/07.png" alt="Futuristic Curriculum" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
                 </div>
-                <h3 className="font-bold text-gray-800 text-center">Futuristic Curriculum</h3>
-                <p className="text-sm text-gray-600 text-center mt-2">Industry-aligned courses</p>
+                <h3 className="font-semibold sm:font-bold text-gray-800 text-center text-sm sm:text-base">Futuristic Curriculum</h3>
+                <p className="text-xs sm:text-sm text-gray-600 text-center mt-1 sm:mt-2">Industry-aligned courses</p>
                 <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
                   <ul className="text-left text-xs text-gray-600 space-y-2">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
-                      <span className="font-medium">Updated syllabus as per industry standards</span>
+                      <span>Updated syllabus as per industry standards</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
-                      <span className="font-medium">Practical training with live projects</span>
+                      <span>Practical training with live projects</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
-                      <span className="font-medium">Learn from industry experts</span>
+                      <span>Learn from industry experts</span>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/08.png" alt="Cutting Edge Course" className="w-8 h-8 object-contain" />
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/08.png" alt="Cutting Edge Course" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
                 </div>
-                <h3 className="font-bold text-gray-800 text-center">Cutting Edge Course</h3>
-                <p className="text-sm text-gray-600 text-center mt-2">Latest technologies</p>
+                <h3 className="font-semibold sm:font-bold text-gray-800 text-center text-sm sm:text-base">Cutting Edge Course</h3>
+                <p className="text-xs sm:text-sm text-gray-600 text-center mt-1 sm:mt-2">Latest technologies</p>
                 <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
                   <ul className="text-left text-xs text-gray-600 space-y-2">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <span className="font-medium">Modern tools and software</span>
+                      <span>Modern tools and software</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <span className="font-medium">Hands-on practical sessions</span>
+                      <span>Hands-on practical sessions</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                      <span className="font-medium">Real-world project experience</span>
+                      <span>Real-world project experience</span>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trophy className="w-8 h-8 text-white" />
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-800 text-center">Tech Revolution</h3>
-                <p className="text-sm text-gray-600 text-center mt-2">Digital transformation</p>
+                <h3 className="font-semibold sm:font-bold text-gray-800 text-center text-sm sm:text-base">Tech Revolution</h3>
+                <p className="text-xs sm:text-sm text-gray-600 text-center mt-1 sm:mt-2">Digital transformation</p>
                 <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
                   <ul className="text-left text-xs text-gray-600 space-y-2">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="font-medium">Digital skills for modern era</span>
+                      <span>Digital skills for modern era</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="font-medium">Cloud computing basics</span>
+                      <span>Cloud computing basics</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="font-medium">Smart technology solutions</span>
+                      <span>Smart technology solutions</span>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
-                <div className="bg-gradient-to-r from-purple-500 to-purple-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-white" />
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                  <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-800 text-center">Empowering Minds</h3>
-                <p className="text-sm text-gray-600 text-center mt-2">Skill development</p>
+                <h3 className="font-semibold sm:font-bold text-gray-800 text-center text-sm sm:text-base">Empowering Minds</h3>
+                <p className="text-xs sm:text-sm text-gray-600 text-center mt-1 sm:mt-2">Skill development</p>
                 <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
                   <ul className="text-left text-xs text-gray-600 space-y-2">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                      <span className="font-medium">Career guidance & counseling</span>
+                      <span>Career guidance & counseling</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                      <span className="font-medium">Soft skills development</span>
+                      <span>Soft skills development</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
-                      <span className="font-medium">Personality development</span>
+                      <span>Personality development</span>
                     </li>
                   </ul>
                 </div>
@@ -248,62 +238,62 @@ export default function HomePage() {
 
             {/* Right Side: Public Announcements */}
             <div className="w-full h-full flex flex-col">
-              <div className="bg-gradient-to-br from-red-600 to-red-700 p-8 h-full min-h-[350px] text-white rounded-xl shadow-xl">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center border-2 border-white/30">
-                    <FileText className="w-8 h-8" />
+              <div className="bg-gradient-to-br from-red-600 to-red-700 p-4 sm:p-8 h-full min-h-[300px] sm:min-h-[350px] text-white rounded-xl shadow-xl">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-xl flex items-center justify-center border-2 border-white/30">
+                    <FileText className="w-6 h-6 sm:w-8 sm:h-8" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold">Public Announcements</h3>
-                    <p className="text-sm text-red-100">Latest Updates & News</p>
+                    <h3 className="text-lg sm:text-2xl font-semibold sm:font-bold">Public Announcements</h3>
+                    <p className="text-xs sm:text-sm text-red-100">Latest Updates & News</p>
                   </div>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
-                    <div className="flex items-start gap-3">
-                      <Bell className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/30">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h4 className="font-bold text-base mb-1">New Batches Starting Soon</h4>
-                        <p className="text-sm text-red-100 hidden md:block">Admissions open for RSCIT, Tally Prime, and Digital Marketing courses. Contact center for details.</p>
+                        <h4 className="font-semibold sm:font-bold text-sm sm:text-base mb-1">New Batches Starting Soon</h4>
+                        <p className="text-xs sm:text-sm text-red-100 hidden md:block">Admissions open for RSCIT, Tally Prime, and Digital Marketing courses. Contact center for details.</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
-                    <div className="flex items-start gap-3">
-                      <Award className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/30">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h4 className="font-bold text-base mb-1">Scholarship Available</h4>
-                        <p className="text-sm text-red-100 hidden md:block">Merit-based scholarships available for deserving students. Up to 50% fee waiver.</p>
+                        <h4 className="font-semibold sm:font-bold text-sm sm:text-base mb-1">Scholarship Available</h4>
+                        <p className="text-xs sm:text-sm text-red-100 hidden md:block">Merit-based scholarships available for deserving students. Up to 50% fee waiver.</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
-                    <div className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/30">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h4 className="font-bold text-base mb-1">Weekend Classes</h4>
-                        <p className="text-sm text-red-100 hidden md:block">Special weekend batches for working professionals. Saturday & Sunday classes available.</p>
+                        <h4 className="font-semibold sm:font-bold text-sm sm:text-base mb-1">Weekend Classes</h4>
+                        <p className="text-xs sm:text-sm text-red-100 hidden md:block">Special weekend batches for working professionals. Saturday & Sunday classes available.</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
-                    <div className="flex items-start gap-3">
-                      <BookOpen className="w-5 h-5 text-purple-400 mt-1 flex-shrink-0" />
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/30">
+                    <div className="flex items-start gap-2 sm:gap-3">
+                      <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400 mt-1 flex-shrink-0" />
                       <div>
-                        <h4 className="font-bold text-base mb-1">Free Demo Classes</h4>
-                        <p className="text-sm text-red-100 hidden md:block">Attend free demo classes before enrollment. Call us to schedule your session.</p>
+                        <h4 className="font-semibold sm:font-bold text-sm sm:text-base mb-1">Free Demo Classes</h4>
+                        <p className="text-xs sm:text-sm text-red-100 hidden md:block">Attend free demo classes before enrollment. Call us to schedule your session.</p>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-6 pt-4 border-t border-white/30">
-                  <Link href="/contact" className="inline-flex items-center px-6 py-3 bg-white text-red-600 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">
-                    Contact for Details <ArrowRight className="w-4 h-4 ml-2" />
+                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-white/30">
+                  <Link href="/contact" className="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-white text-red-600 rounded-lg font-semibold sm:font-bold text-xs sm:text-sm hover:bg-gray-100 transition-colors">
+                    Contact for Details <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
                   </Link>
                 </div>
               </div>
@@ -313,9 +303,9 @@ export default function HomePage() {
       </section>
 
       {/* Course Catalogue */}
-      <section className="py-16">
+      <section className="py-12 sm:py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Pick a Course to Get Started</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold sm:font-bold mb-6 sm:mb-8 text-center">Pick a Course to Get Started</h2>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {COURSES.map((course) => (
               <div key={course.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full">
@@ -323,8 +313,7 @@ export default function HomePage() {
                   <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-2 sm:p-6 flex flex-col flex-grow">
-                  <span className={`${course.tagColor} text-xs px-2 py-1 rounded-full`}>{course.tag}</span>
-                  <h3 className="text-xs sm:text-xl font-bold mt-1 sm:mt-3 mb-1 sm:mb-2">{course.title}</h3>
+                  <h3 className="text-xs sm:text-xl font-semibold sm:font-bold mt-1 sm:mt-3 mb-1 sm:mb-2">{course.title}</h3>
                   <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-4 hidden sm:block flex-grow">{course.desc}</p>
                   <div className="mt-auto">
                     <Link href="/courses" className="block bg-red-600 hover:bg-red-700 text-white text-center py-1.5 px-1 sm:py-2.5 sm:px-4 font-medium text-xs sm:text-sm border-2 border-red-700 hover:border-red-800 transition-colors">
@@ -339,13 +328,13 @@ export default function HomePage() {
       </section>
 
       {/* Franchise Red Banner */}
-      <section className="bg-red-700 py-12">
+      <section className="bg-red-700 py-10 sm:py-12">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-xl sm:text-3xl font-semibold sm:font-bold text-white mb-4">
             Our Center focus on Institute Management / Student Verification / No.1 Computer Education
           </h2>
-          <Link href="/franchise" className="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-lg font-bold text-lg transition-colors mt-4">
-            APPLY NOW <ArrowRight className="w-5 h-5 ml-2" />
+          <Link href="/franchise" className="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold sm:font-bold text-base sm:text-lg transition-colors mt-4">
+            APPLY NOW <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
           </Link>
         </div>
       </section>

@@ -13,10 +13,12 @@ const TYPE_OPTIONS: { value: DocumentType; label: string; icon: typeof Award }[]
 
 export function CertificateForm({
   onGenerate,
+  initialData,
 }: {
   onGenerate: (data: CertificateData) => void;
+  initialData?: CertificateData;
 }) {
-  const [data, setData] = useState<CertificateData>(SAMPLE_CERTIFICATE);
+  const [data, setData] = useState<CertificateData>(initialData ?? SAMPLE_CERTIFICATE);
   const [errors, setErrors] = useState<Partial<Record<keyof CertificateData, string>>>({});
   const [attempted, setAttempted] = useState(false);
 

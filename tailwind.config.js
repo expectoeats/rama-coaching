@@ -22,7 +22,8 @@ module.exports = {
       },
       fontFamily: {
         serif: ['"Hoefler Text"', '"Baskerville"', 'Georgia', '"Times New Roman"', "serif"],
-        sans: ['"Iowan Old Style"', 'Georgia', 'Cambria', '"Times New Roman"', "serif"],
+        sans: ['"Poppins"', 'sans-serif'],
+        poppins: ['"Poppins"', 'sans-serif'],
       },
       borderRadius: {
         soft: "3px",

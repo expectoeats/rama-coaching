@@ -2,9 +2,61 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, BookOpen } from "lucide-react";
+import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, Calendar, BookOpen, Bell, TrendingUp } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
+
+const COURSES = [
+  {
+    id: 1,
+    title: "RSCIT / Basic Computer Course",
+    desc: "Learn fundamental computer skills and operations",
+    tag: "Popular",
+    tagColor: "bg-red-100 text-red-700",
+    img: "https://lakshaygroupedu.co.in/img/a215/COURSES/1736NuswVu6kHYQs0Y9.png",
+  },
+  {
+    id: 2,
+    title: "Tally Prime Course",
+    desc: "Master accounting software for business",
+    tag: "Accounting",
+    tagColor: "bg-blue-100 text-blue-700",
+    img: "https://lakshaygroupedu.co.in/img/a215/COURSES/6YMQOiXLQMbDCxJ1504.jpg",
+  },
+  {
+    id: 3,
+    title: "Digital Marketing Course",
+    desc: "Learn online marketing strategies",
+    tag: "Marketing",
+    tagColor: "bg-green-100 text-green-700",
+    img: "https://lakshaygroupedu.co.in/img/a215/COURSES/3dWyZiQ3iUvKf8M1503.jpg",
+  },
+  {
+    id: 4,
+    title: "RSCFA Financial Accounting",
+    desc: "Advanced financial accounting skills",
+    tag: "Finance",
+    tagColor: "bg-yellow-100 text-yellow-700",
+    img: "https://lakshaygroupedu.co.in/img/a215/COURSES/3kBn78NNbVcyS1r1477.jfif",
+  },
+  {
+    id: 5,
+    title: "ADCA / DCA Diploma",
+    desc: "Comprehensive computer applications diploma",
+    tag: "Diploma",
+    tagColor: "bg-purple-100 text-purple-700",
+    img: "https://lakshaygroupedu.co.in/img/a215/COURSES/6plD3i2vEuM1SwP1405.jpg",
+  },
+];
+
+const ACHIEVER_IMG = "https://lakshaygroupedu.co.in/img/a215/CMS/215WnKD0lF2fXa7p2QSideImg.jpeg";
+
+const GALLERY_IMAGES = [
+  { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215utACaRweHzNenbjPhoto.png", alt: "Gallery Photo 1" },
+  { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215xJEZu6s4HthncXjPhoto.jpeg", alt: "Gallery Photo 2" },
+  { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215QL4KNwPjkuI37PBPhoto.jpeg", alt: "Gallery Photo 3" },
+  { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215CDr4B1dSkA8DW6UPhoto.jpeg", alt: "Gallery Photo 4" },
+];
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -20,28 +72,33 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <SiteNav />
 
-      {/* Hero Slider Section */}
+      {/* Hero Banner */}
       <section className="relative w-full overflow-hidden">
-        <div className="w-full h-64 md:h-96 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-          <GraduationCap className="w-24 h-24" />
-        </div>
+        <img
+          src="https://lakshaygroupedu.co.in/img/a215/CMS/215Z8YisHX6YPf1lWsSlider.jpeg"
+          alt="Rama Coaching Center Hero Banner"
+          className="w-full h-[280px] sm:h-[380px] md:h-[480px] lg:h-[560px] object-cover"
+        />
+        
       </section>
 
-      {/* Be Part of Us Section */}
+      {/* Be Part of Us */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2">
-              <div className="w-full h-64 md:h-80 rounded-lg shadow-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Users className="w-20 h-20" />
-              </div>
+              <img
+                src="https://lakshaygroupedu.co.in/img/a215/CMS/2156zgXAoXRGxKypyfSideImg.png"
+                alt="Be Part of Us"
+                className="w-full h-64 md:h-80 rounded-lg shadow-lg object-cover"
+              />
             </div>
             <div className="w-full md:w-1/2">
               <h2 className="text-4xl font-bold mb-4">
                 <span className="text-red-700">Be Part</span> <span className="text-gray-800">of Us</span>
               </h2>
               <p className="text-gray-600 text-lg mb-6">
-                Join our mission to provide quality computer education to students across Uttar Pradesh. 
+                Join our mission to provide quality computer education to students across Uttar Pradesh.
                 We are committed to shaping the future of our students with practical skills and industry-relevant knowledge.
               </p>
               <Link href="/contact" className="inline-flex items-center bg-red-700 hover:bg-red-800 text-white px-8 py-3 rounded-lg font-bold transition-colors">
@@ -88,123 +145,195 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Why Choose Us */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-12">
-            <div className="w-full lg:w-1/2">
-              <h2 className="text-3xl font-bold mb-8 text-center">Why Choose Us?</h2>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <GraduationCap className="w-12 h-12 mb-4 text-red-600" />
-                  <h3 className="font-bold text-gray-800">Futuristic Curriculum</h3>
-                  <p className="text-sm text-gray-600 mt-2">Industry-aligned courses</p>
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Why Choose Rama Coaching Center?</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+            {/* Left Side: 2x2 Feature Cards Grid */}
+            <div className="grid grid-cols-2 gap-6 h-full">
+              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-red-500 to-red-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/07.png" alt="Futuristic Curriculum" className="w-8 h-8 object-contain" />
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <FileText className="w-12 h-12 mb-4 text-blue-600" />
-                  <h3 className="font-bold text-gray-800">Cutting Edge Course</h3>
-                  <p className="text-sm text-gray-600 mt-2">Latest technologies</p>
+                <h3 className="font-bold text-gray-800 text-center">Futuristic Curriculum</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">Industry-aligned courses</p>
+                <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
+                  <ul className="text-left text-xs text-gray-600 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
+                      <span className="font-medium">Updated syllabus as per industry standards</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
+                      <span className="font-medium">Practical training with live projects</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-red-600 flex-shrink-0" />
+                      <span className="font-medium">Learn from industry experts</span>
+                    </li>
+                  </ul>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <Trophy className="w-12 h-12 mb-4 text-green-600" />
-                  <h3 className="font-bold text-gray-800">Tech Revolution</h3>
-                  <p className="text-sm text-gray-600 mt-2">Digital transformation</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <img src="https://lakshaygroupedu.co.in/assets/images/feature/08.png" alt="Cutting Edge Course" className="w-8 h-8 object-contain" />
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                  <Users className="w-12 h-12 mb-4 text-purple-600" />
-                  <h3 className="font-bold text-gray-800">Empowering Minds</h3>
-                  <p className="text-sm text-gray-600 mt-2">Skill development</p>
+                <h3 className="font-bold text-gray-800 text-center">Cutting Edge Course</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">Latest technologies</p>
+                <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
+                  <ul className="text-left text-xs text-gray-600 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <span className="font-medium">Modern tools and software</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <span className="font-medium">Hands-on practical sessions</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <span className="font-medium">Real-world project experience</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-green-500 to-green-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Trophy className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-gray-800 text-center">Tech Revolution</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">Digital transformation</p>
+                <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
+                  <ul className="text-left text-xs text-gray-600 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <span className="font-medium">Digital skills for modern era</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <span className="font-medium">Cloud computing basics</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                      <span className="font-medium">Smart technology solutions</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 border-2 border-gray-100">
+                <div className="bg-gradient-to-r from-purple-500 to-purple-600 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="font-bold text-gray-800 text-center">Empowering Minds</h3>
+                <p className="text-sm text-gray-600 text-center mt-2">Skill development</p>
+                <div className="mt-4 pt-4 border-t border-gray-200 hidden md:block">
+                  <ul className="text-left text-xs text-gray-600 space-y-2">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                      <span className="font-medium">Career guidance & counseling</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                      <span className="font-medium">Soft skills development</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                      <span className="font-medium">Personality development</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
-            <div className="w-full lg:w-1/2">
-              <div className="w-full h-64 md:h-80 rounded-lg shadow-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Award className="w-20 h-20" />
+
+            {/* Right Side: Public Announcements */}
+            <div className="w-full h-full flex flex-col">
+              <div className="bg-gradient-to-br from-red-600 to-red-700 p-8 h-full min-h-[350px] text-white rounded-xl shadow-xl">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center border-2 border-white/30">
+                    <FileText className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Public Announcements</h3>
+                    <p className="text-sm text-red-100">Latest Updates & News</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
+                    <div className="flex items-start gap-3">
+                      <Bell className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-base mb-1">New Batches Starting Soon</h4>
+                        <p className="text-sm text-red-100 hidden md:block">Admissions open for RSCIT, Tally Prime, and Digital Marketing courses. Contact center for details.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
+                    <div className="flex items-start gap-3">
+                      <Award className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-base mb-1">Scholarship Available</h4>
+                        <p className="text-sm text-red-100 hidden md:block">Merit-based scholarships available for deserving students. Up to 50% fee waiver.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
+                    <div className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-base mb-1">Weekend Classes</h4>
+                        <p className="text-sm text-red-100 hidden md:block">Special weekend batches for working professionals. Saturday & Sunday classes available.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/30">
+                    <div className="flex items-start gap-3">
+                      <BookOpen className="w-5 h-5 text-purple-400 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-base mb-1">Free Demo Classes</h4>
+                        <p className="text-sm text-red-100 hidden md:block">Attend free demo classes before enrollment. Call us to schedule your session.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6 pt-4 border-t border-white/30">
+                  <Link href="/contact" className="inline-flex items-center px-6 py-3 bg-white text-red-600 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">
+                    Contact for Details <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Course Catalogue Section */}
+      {/* Course Catalogue */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center">Pick a Course to Get Started</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Course 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <BookOpen className="w-16 h-16" />
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            {COURSES.map((course) => (
+              <div key={course.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full">
+                <div className="w-full h-24 sm:h-48 bg-gray-100 overflow-hidden flex-shrink-0">
+                  <img src={course.img} alt={course.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-2 sm:p-6 flex flex-col flex-grow">
+                  <span className={`${course.tagColor} text-xs px-2 py-1 rounded-full`}>{course.tag}</span>
+                  <h3 className="text-xs sm:text-xl font-bold mt-1 sm:mt-3 mb-1 sm:mb-2">{course.title}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-4 hidden sm:block flex-grow">{course.desc}</p>
+                  <div className="mt-auto">
+                    <Link href="/courses" className="block bg-red-600 hover:bg-red-700 text-white text-center py-1.5 px-1 sm:py-2.5 sm:px-4 font-medium text-xs sm:text-sm border-2 border-red-700 hover:border-red-800 transition-colors">
+                      Enroll Now
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="p-6">
-                <span className="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">Popular</span>
-                <h3 className="text-xl font-bold mt-3 mb-2">RSCIT / Basic Computer Course</h3>
-                <p className="text-gray-600 text-sm mb-4">Learn fundamental computer skills and operations</p>
-                <Link href="/courses" className="block bg-red-700 hover:bg-red-800 text-white text-center py-2 rounded-lg font-bold transition-colors">
-                  Enroll Now <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Course 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <CreditCard className="w-16 h-16" />
-              </div>
-              <div className="p-6">
-                <span className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">Accounting</span>
-                <h3 className="text-xl font-bold mt-3 mb-2">Tally Prime Course</h3>
-                <p className="text-gray-600 text-sm mb-4">Master accounting software for business</p>
-                <Link href="/courses" className="block bg-red-700 hover:bg-red-800 text-white text-center py-2 rounded-lg font-bold transition-colors">
-                  Enroll Now <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Course 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Trophy className="w-16 h-16" />
-              </div>
-              <div className="p-6">
-                <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">Marketing</span>
-                <h3 className="text-xl font-bold mt-3 mb-2">Digital Marketing Course</h3>
-                <p className="text-gray-600 text-sm mb-4">Learn online marketing strategies</p>
-                <Link href="/courses" className="block bg-red-700 hover:bg-red-800 text-white text-center py-2 rounded-lg font-bold transition-colors">
-                  Enroll Now <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Course 4 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Award className="w-16 h-16" />
-              </div>
-              <div className="p-6">
-                <span className="bg-yellow-100 text-yellow-700 text-xs px-3 py-1 rounded-full">Finance</span>
-                <h3 className="text-xl font-bold mt-3 mb-2">RSCFA Financial Accounting</h3>
-                <p className="text-gray-600 text-sm mb-4">Advanced financial accounting skills</p>
-                <Link href="/courses" className="block bg-red-700 hover:bg-red-800 text-white text-center py-2 rounded-lg font-bold transition-colors">
-                  Enroll Now <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Course 5 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <GraduationCap className="w-16 h-16" />
-              </div>
-              <div className="p-6">
-                <span className="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full">Diploma</span>
-                <h3 className="text-xl font-bold mt-3 mb-2">ADCA / DCA Diploma</h3>
-                <p className="text-gray-600 text-sm mb-4">Comprehensive computer applications diploma</p>
-                <Link href="/courses" className="block bg-red-700 hover:bg-red-800 text-white text-center py-2 rounded-lg font-bold transition-colors">
-                  Enroll Now <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -221,15 +350,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Our Achievers Photo Gallery */}
+      {/* Our Achievers */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center">Our Achievers</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <div key={item} className="text-center">
-                <div className="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-red-700 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                  <GraduationCap className="w-10 h-10" />
+                <div className="w-24 h-24 rounded-full mx-auto mb-3 border-4 border-red-700 overflow-hidden">
+                  <img src={ACHIEVER_IMG} alt={`Achiever ${item}`} className="w-full h-full object-cover" />
                 </div>
                 <p className="font-bold text-gray-800">Student {item}</p>
                 <p className="text-sm text-gray-600">Course Graduate</p>
@@ -239,14 +368,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Counselling & Admission Guidance */}
+      {/* Counselling & Admission */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2">
-              <div className="w-full h-64 md:h-80 rounded-lg shadow-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Users className="w-20 h-20" />
-              </div>
+              <img src="https://lakshaygroupedu.co.in/assets/images/about/01.png" alt="Free Admission Counselling" className="w-full h-64 md:h-80 rounded-lg shadow-lg object-contain" />
             </div>
             <div className="w-full md:w-1/2">
               <h2 className="text-3xl font-bold mb-4">Free Institute Admission Counselling</h2>
@@ -273,16 +400,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">What Our Students Say</h2>
+      {/* What People Say About Us */}
+      <section className="py-16 relative bg-cover bg-center" style={{ backgroundImage: "url('https://lakshaygroupedu.co.in/img/a215/CMS/215McUfxyzTIvRisyzSlider.jpg')" }}>
+        <div className="absolute inset-0 bg-white/80" />
+        <div className="relative container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">What People Say About Us</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((item) => (
               <div key={item} className="bg-white p-6 rounded-lg shadow-lg border-l-4 border-green-600">
                 <div className="flex items-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white mr-4">
-                    <Trophy className="w-7 h-7" />
+                  <div className="w-16 h-16 rounded-full overflow-hidden mr-4 flex-shrink-0">
+                    <img src={ACHIEVER_IMG} alt={`Student ${item}`} className="w-full h-full object-cover" />
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-800">Student {item}</h4>
@@ -290,7 +418,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "Excellent teaching methodology and practical approach. The faculty is very supportive and the curriculum is industry-relevant."
+                  &ldquo;Excellent teaching methodology and practical approach. The faculty is very supportive and the curriculum is industry-relevant.&rdquo;
                 </p>
               </div>
             ))}
@@ -298,7 +426,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Photo Gallery */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8 text-center">Our Professional Photo Gallery</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {GALLERY_IMAGES.map((img, i) => (
+              <div key={i} className="rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <img src={img.src} alt={img.alt} className="w-full h-48 md:h-64 object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
       <section className="py-10 border-y-4 border-yellow-500 bg-gradient-to-r from-red-700 via-red-600 to-red-700">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -334,33 +476,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Franchise Promotion Cards */}
+      {/* Franchise + Verification Cards */}
       <section className="py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto px-4 py-10">
-          {/* Card Wrapper with light shadow & crisp border */}
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-full bg-slate-50 flex items-center justify-center p-2">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Building2 className="w-16 h-16" />
-              </div>
+            <div className="w-full bg-slate-50 flex items-center justify-center p-4">
+              <img src="https://lakshaygroupedu.co.in/assets/images/achive/01.png" alt="Join Our Franchise" className="w-full h-48 object-contain" />
             </div>
             <div className="p-6 text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Join Our Franchise Network</h3>
               <p className="text-sm text-gray-600 mb-4">Become part of our growing network of computer education.</p>
-              <Link href="/franchise" className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded transition-colors">Apply Now</Link>
+              <Link href="/franchise" className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm border-2 border-red-700 hover:border-red-800 transition-colors">Apply Now</Link>
             </div>
           </div>
 
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-            <div className="w-full bg-slate-50 flex items-center justify-center p-2">
-              <div className="w-full h-48 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                <Award className="w-16 h-16" />
-              </div>
+            <div className="w-full bg-slate-50 flex items-center justify-center p-4">
+              <img src="https://lakshaygroupedu.co.in/assets/images/achive/02.png" alt="Student Verification System" className="w-full h-48 object-contain" />
             </div>
             <div className="p-6 text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Student Verification System</h3>
               <p className="text-sm text-gray-600 mb-4">Easy and secure certificate verification for employers.</p>
-              <Link href="/verification" className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold text-sm rounded transition-colors">Verify Now</Link>
+              <Link href="/verification" className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium text-sm border-2 border-red-700 hover:border-red-800 transition-colors">Verify Now</Link>
             </div>
           </div>
         </div>

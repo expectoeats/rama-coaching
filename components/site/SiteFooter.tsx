@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 
 export default function SiteFooter() {
   return (
@@ -65,10 +65,26 @@ export default function SiteFooter() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center">
-          <p className="text-gray-400 text-sm">
-            © Rama Coaching Center And Computer Education Center. All Rights Reserved.
-          </p>
+        <div className="border-t border-gray-700 mt-8 pt-8">
+          <div className="text-center mb-4">
+            <p className="text-gray-400 text-sm">
+              © Rama Coaching Center And Computer Education Center. All Rights Reserved.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
+              <span className="text-gray-500 text-xs">Designed & Developed by</span>
+              <Link 
+                href="https://expecto.online" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white text-sm font-medium transition-colors flex items-center gap-1"
+              >
+                <span className="text-red-500 font-bold">Expecto</span>
+                <ExternalLink className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

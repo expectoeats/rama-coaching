@@ -8,14 +8,14 @@ const HEIGHT = 1123;
 
 export function ExcellenceCertificate({ data }: { data: CertificateData }) {
   const fields: { label: string; value: string }[] = [
-    { label: "Name Of Student", value: data.studentName },
-    { label: "Father's Name", value: data.fatherName },
-    { label: "Course Code", value: data.courseCode },
-    { label: "Name Of Course", value: data.courseName },
-    { label: "Date Of Completion", value: data.completionDate },
-    { label: "Center Code", value: data.centerCode },
+    { label: "Name Of Student",       value: data.studentName },
+    { label: "Father's Name",         value: data.fatherName },
+    { label: "Course Code",           value: data.courseCode },
+    { label: "Name Of Course",        value: data.courseName },
+    { label: "Date Of Completion",    value: data.completionDate },
+    { label: "Center Code",           value: data.centerCode },
     { label: "Name Of Training Center", value: data.trainingCenter },
-    { label: "Performance", value: data.performance },
+    { label: "Performance",           value: data.performance },
   ];
 
   return (
@@ -30,20 +30,19 @@ export function ExcellenceCertificate({ data }: { data: CertificateData }) {
             <svg viewBox="0 0 200 200" className="seal-wm-svg">
               <circle cx="100" cy="100" r="96" className="seal-wm-outer" />
               <circle cx="100" cy="100" r="82" className="seal-wm-inner" />
-              <text x="100" y="106" className="seal-wm-text">
-                RCCACE
-              </text>
+              <text x="100" y="106" className="seal-wm-text">RCCACE</text>
             </svg>
           </div>
 
           <div className="doc-flow">
             <div className="doc-flow-top">
               <header className="doc-flow-header">
+                {/* Arched institution name — increased font size for prominence */}
                 <svg className="doc-arch-flow" viewBox="-30 -70 960 320" aria-hidden="true">
                   <defs>
                     <path id="archPathFlow" d="M 20,250 A 470,250 0 0 1 880,250" fill="none" />
                   </defs>
-                  <text style={{ fontSize: 110 }} fill="#000000">
+                  <text style={{ fontSize: 130 }} fill="#000000">
                     <textPath
                       href="#archPathFlow"
                       startOffset="50%"
@@ -62,6 +61,7 @@ export function ExcellenceCertificate({ data }: { data: CertificateData }) {
                 </div>
               </header>
 
+              {/* Meta row: Sl.No + Roll No (left) | Enrollment No (right) */}
               <div className="doc-meta-row">
                 <div className="doc-meta-left">
                   <div>
@@ -77,6 +77,21 @@ export function ExcellenceCertificate({ data }: { data: CertificateData }) {
                   <div>
                     <span className="doc-meta-label">Enrollment No. :</span>
                     <span className="doc-meta-value">{data.enrollmentNo || "—"}</span>
+                  </div>
+                  {/* Certificate number — directly below Enrollment No */}
+                  <div style={{ marginTop: 3 }}>
+                    <span className="doc-meta-label">Cert. No. :</span>
+                    <span
+                      className="doc-meta-value"
+                      style={{
+                        fontFamily: "monospace",
+                        fontWeight: 700,
+                        letterSpacing: "0.04em",
+                        color: "#1F3354",
+                      }}
+                    >
+                      {data.certificateNumber || "—"}
+                    </span>
                   </div>
                 </div>
               </div>

@@ -6,7 +6,7 @@ import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIco
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 
-const COURSES = [
+const FALLBACK_COURSES = [
   {
     id: 1,
     title: "RSCIT / Basic Computer Course",
@@ -50,6 +50,16 @@ const GALLERY_IMAGES = [
 
 export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [courses, setCourses] = useState(FALLBACK_COURSES);
+  useEffect(() => {
+    fetch("/api/courses?limit=12", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success && j.data.length > 0) {
+          setCourses(j.data.map((c:any, i:number)=>({ id: c.id || i, title: c.name, desc: c.description, img: FALLBACK_COURSES[i % FALLBACK_COURSES.length].img, fees: c.fees, duration: c.duration })));
+        }
+      }).catch(()=>{});
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -307,7 +317,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-semibold sm:font-bold mb-6 sm:mb-8 text-center">Pick a Course to Get Started</h2>
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
-            {COURSES.map((course) => (
+            {courses.map((course) => (
               <div key={course.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full">
                 <div className="w-full h-24 sm:h-48 bg-gray-100 overflow-hidden flex-shrink-0">
                   <img src={course.img} alt={course.title} className="w-full h-full object-cover" />

@@ -12,32 +12,40 @@ export default function VerificationPage() {
   const [isSearching, setIsSearching] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!certificateNumber.trim() && !rollNumber.trim()) {
+      setResult({ found: false, message: "Please enter a certificate number or roll number" });
+      return;
+    }
     setIsSearching(true);
-
-    // Simulate search - in real app, this would be an API call
-    setTimeout(() => {
-      if (certificateNumber || rollNumber) {
+    setResult(null);
+    try {
+      const params = new URLSearchParams();
+      if (certificateNumber.trim()) params.set("certificateNumber", certificateNumber.trim());
+      if (rollNumber.trim()) params.set("rollNumber", rollNumber.trim());
+      const res = await fetch(`/api/verify?${params.toString()}`, { cache: "no-store" });
+      const j = await res.json();
+      if (j.success && j.found) {
         setResult({
           found: true,
-          studentName: "Rahul Kumar",
-          course: "RSCIT / Basic Computer Course",
-          certificateNumber: certificateNumber || "RCC/2026/1234",
-          rollNumber: rollNumber || "RCC/2026/001",
-          issueDate: "15th August 2026",
+          studentName: j.data.studentName,
+          course: j.data.courseName || j.data.course,
+          certificateNumber: j.data.certificateNumber,
+          rollNumber: j.data.rollNumber,
+          issueDate: j.data.issueDate,
           validity: "Lifetime",
-          grade: "A+",
-          center: "Rama Coaching Center, Fatehpur"
+          grade: j.data.grade || "A",
+          center: j.data.trainingCenter,
         });
       } else {
-        setResult({
-          found: false,
-          message: "Please enter a certificate number or roll number"
-        });
+        setResult({ found: false, message: j.error || "Certificate not found. Please check the number." });
       }
+    } catch {
+      setResult({ found: false, message: "Network error. Please try again." });
+    } finally {
       setIsSearching(false);
-    }, 1500);
+    }
   };
 
   return (

@@ -18,7 +18,6 @@ import { EmptyState, Spinner } from "@/components/ui/EmptyState";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { franchiseStatusVariant, titleCase } from "@/lib/status";
-import { franchiseApplications as seed } from "@/data/franchise";
 import type { FranchiseApplication, FranchiseStatus } from "@/data/types";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
@@ -53,13 +52,16 @@ export default function FranchisePage() {
   const [pendingStatus, setPendingStatus] = useState<FranchiseStatus>("pending");
   const [deleteItem, setDeleteItem] = useState<FranchiseApplication | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setApplications(seed);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/franchise", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setApplications(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const pendingCount = useMemo(
     () => applications.filter((a) => a.status === "pending").length,
@@ -93,23 +95,35 @@ export default function FranchisePage() {
     setStatusItem(item);
   }
 
-  function saveStatus() {
+  async function saveStatus() {
     if (!statusItem) return;
-    setApplications((prev) =>
-      prev.map((a) => (a.id === statusItem.id ? { ...a, status: pendingStatus } : a))
-    );
-    setStatusItem(null);
+    try {
+      const res = await fetch(`/api/franchise/${statusItem.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: pendingStatus }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update status"); return; }
+      await fetchList();
+      setStatusItem(null);
+    } catch { alert("Network error while updating status"); }
   }
 
-  function setQuickStatus(item: FranchiseApplication, status: FranchiseStatus) {
-    setApplications((prev) =>
-      prev.map((a) => (a.id === item.id ? { ...a, status } : a))
-    );
+  async function setQuickStatus(item: FranchiseApplication, status: FranchiseStatus) {
+    try {
+      const res = await fetch(`/api/franchise/${item.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update status"); return; }
+      await fetchList();
+      setStatusItem(null);
+    } catch { alert("Network error while updating status"); }
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!deleteItem) return;
-    setApplications((prev) => prev.filter((a) => a.id !== deleteItem.id));
+    try {
+      const res = await fetch(`/api/franchise/${deleteItem.id}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting application"); }
     setDeleteItem(null);
   }
 

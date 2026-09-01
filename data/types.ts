@@ -11,6 +11,7 @@ export interface Student {
   admissionDate: string;
   status: StudentStatus;
   avatarColor: string;
+  photoUrl?: string;
 }
 
 export type CertificateType = "excellence" | "marksheet";
@@ -25,6 +26,7 @@ export interface CertificateRecord {
   type: CertificateType;
   issueDate: string;
   status: CertificateStatus;
+  isSentToStudent?: boolean;
 }
 
 export interface Course {

@@ -17,6 +17,8 @@ export function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        autoComplete="off"
+        spellCheck={false}
         className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-700 outline-none focus:border-navy focus:ring-2 focus:ring-navy/20"
       />
     </div>
@@ -38,7 +40,7 @@ export function SelectInput({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-navy focus:ring-2 focus:ring-navy/20"
+      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-navy focus:ring-2 focus:ring-navy/20"
     >
       {placeholder ? <option value="">{placeholder}</option> : null}
       {options.map((o) => (

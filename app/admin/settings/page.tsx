@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Upload, Info } from "lucide-react";
 import { PageHeader, Card } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
 import { Field, TextInput, TextArea } from "@/components/ui/Field";
-import { instituteSettings } from "@/data/settings";
+// settings from API
 import type { InstituteSettings } from "@/data/types";
 
 const TABS = [
@@ -24,8 +24,11 @@ const URL_FIELDS: { key: keyof InstituteSettings; label: string }[] = [
 export default function SettingsPage() {
   const [tab, setTab] = useState("info");
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState<InstituteSettings>({ ...instituteSettings });
+  const [form, setForm] = useState<InstituteSettings>({ instituteName: "", phone: "", email: "", address: "", website: "", facebook: "", instagram: "", youtube: "", linkedin: "", footerText: "" });
+  const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof InstituteSettings, string>>>({});
+
+  useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then(r=>r.json()).then(j=>{ if(j.success) { const d=j.data; setForm({ instituteName: d.instituteName||"", phone: d.phone||"", email: d.email||"", address: d.address||"", website: d.website||"", facebook: d.facebook||"", instagram: d.instagram||"", youtube: d.youtube||"", linkedin: d.linkedin||"", footerText: d.footerText||"" }); } }).finally(()=>setLoading(false)); }, []);
 
   function update(key: keyof InstituteSettings, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -33,7 +36,7 @@ export default function SettingsPage() {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   }
 
-  function handleSave() {
+  async function handleSave() {
     const next: Partial<Record<keyof InstituteSettings, string>> = {};
     if (!form.instituteName.trim()) next.instituteName = "Institute name is required.";
     if (!form.phone.trim()) next.phone = "Phone is required.";
@@ -44,11 +47,16 @@ export default function SettingsPage() {
       next.website = "Enter a valid URL (https://...).";
     setErrors(next);
     if (Object.keys(next).length === 0) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      try {
+        const res = await fetch("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+        const j = await res.json();
+        if (j.success) { setSaved(true); setTimeout(() => setSaved(false), 3000); }
+        else { setErrors({ instituteName: j.error || "Failed" }); }
+      } catch { setErrors({ instituteName: "Network error" }); }
     }
   }
 
+  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" /></div>;
   return (
     <div>
       <PageHeader

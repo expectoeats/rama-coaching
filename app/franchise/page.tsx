@@ -1,9 +1,43 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
 import { Building2, Award, Users, TrendingUp, Check, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
+
+function FranchiseForm() {
+  const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", state: "", message: "" });
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const handle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/api/franchise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+      const j = await res.json();
+      if (j.success) { setDone(true); setForm({ name: "", email: "", phone: "", city: "", state: "", message: "" }); setTimeout(()=>setDone(false),4000); }
+      else alert(j.error||"Failed");
+    } catch { alert("Network error"); } finally { setLoading(false); }
+  };
+  return (
+    <form onSubmit={handle} className="space-y-4">
+      {done && <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">Application submitted successfully! We will contact you soon.</div>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input required placeholder="Full Name *" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+        <input required type="email" placeholder="Email *" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input required placeholder="Phone *" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+        <input required placeholder="City *" value={form.city} onChange={e=>setForm({...form,city:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+      </div>
+      <input required placeholder="State *" value={form.state} onChange={e=>setForm({...form,state:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+      <textarea required placeholder="Tell us about yourself & location..." rows={4} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+      <button disabled={loading} type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading?"Submitting...":"Submit Application"}</button>
+    </form>
+  );
+}
 
 export default function FranchisePage() {
   return (
@@ -189,15 +223,22 @@ export default function FranchisePage() {
         </div>
       </section>
 
+      {/* Franchise Application Form */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-2xl mx-auto px-6">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Apply for Franchise</h2>
+            <FranchiseForm />
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-red-700 to-red-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Own Computer Education Center?</h2>
           <p className="text-xl text-red-100 mb-8">Join our successful franchise network and become part of the computer education revolution</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/contact" className="px-8 py-3 bg-white text-red-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
-              Apply Now
-            </Link>
             <Link href="tel:08299121689" className="px-8 py-3 bg-yellow-500 text-gray-900 rounded-lg font-bold hover:bg-yellow-600 transition-colors">
               Call: 08299121689
             </Link>

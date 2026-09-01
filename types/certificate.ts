@@ -14,6 +14,9 @@ export type MarkRow = {
 export type CertificateData = {
   documentType: DocumentType;
 
+  /* Unique certificate identifier — printed on the document */
+  certificateNumber: string;
+
   /* Header meta (serial / roll / enrollment) */
   slNo: string;
   rollNo: string;

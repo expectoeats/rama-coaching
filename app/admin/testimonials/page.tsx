@@ -13,7 +13,7 @@ import { EmptyState, Spinner } from "@/components/ui/EmptyState";
 import { Avatar } from "@/components/ui/Tabs";
 import { boolStatusVariant } from "@/lib/status";
 
-import { testimonials as seedTestimonials } from "@/data/testimonials";
+// testimonials loaded from API
 import type { Testimonial } from "@/data/types";
 
 type TestimonialDraft = Omit<Testimonial, "id">;
@@ -58,13 +58,16 @@ export default function TestimonialsAdminPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(seedTestimonials);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/testimonials", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -113,23 +116,28 @@ export default function TestimonialsAdminPage() {
     return Object.keys(e).length === 0;
   }
 
-  function save() {
+  async function save() {
     if (!validate()) return;
-    if (editingId) {
-      setItems((prev) =>
-        prev.map((t) => (t.id === editingId ? { ...t, ...draft } : t)),
-      );
-    } else {
-      const newItem: Testimonial = { id: `t-${Date.now()}`, ...draft };
-      setItems((prev) => [newItem, ...prev]);
-    }
-    setModalOpen(false);
+    try {
+      const url = editingId ? `/api/testimonials/${editingId}` : "/api/testimonials";
+      const method = editingId ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(draft) });
+      const j = await res.json();
+      if (!j.success) { setErrors({ studentName: j.error || "Failed to save" }); alert(j.error || "Failed to save testimonial"); return; }
+      await fetchList();
+      setModalOpen(false);
+    } catch { alert("Network error while saving testimonial"); }
   }
 
-  function togglePublish(id: string) {
-    setItems((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, published: !t.published } : t)),
-    );
+  async function togglePublish(id: string) {
+    const target = items.find((t) => t.id === id);
+    if (!target) return;
+    try {
+      const res = await fetch(`/api/testimonials/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ published: !target.published }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update"); return; }
+      await fetchList();
+    } catch { alert("Network error while updating testimonial"); }
   }
 
   function askDelete(id: string) {
@@ -137,8 +145,14 @@ export default function TestimonialsAdminPage() {
     setConfirmOpen(true);
   }
 
-  function confirmDelete() {
-    if (deleteId) setItems((prev) => prev.filter((t) => t.id !== deleteId));
+  async function confirmDelete() {
+    if (!deleteId) return;
+    try {
+      const res = await fetch(`/api/testimonials/${deleteId}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting testimonial"); }
     setDeleteId(null);
   }
 

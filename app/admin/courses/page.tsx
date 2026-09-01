@@ -21,7 +21,7 @@ import { Field, TextInput, TextArea, SelectField } from "@/components/ui/Field";
 import { EmptyState, Spinner } from "@/components/ui/EmptyState";
 import { courseStatusVariant } from "@/lib/status";
 
-import { courses as seedCourses } from "@/data/courses";
+// courses loaded from API
 import type { Course } from "@/data/types";
 
 type CourseDraft = Omit<Course, "id">;
@@ -52,13 +52,20 @@ export default function CoursesAdminPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(seedCourses);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (query) params.set("search", query);
+      if (statusFilter && statusFilter !== "all") params.set("status", statusFilter);
+      const res = await fetch("/api/courses?" + params.toString(), { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
+  useEffect(() => { fetchList(); }, [query, statusFilter]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -106,17 +113,17 @@ export default function CoursesAdminPage() {
     return Object.keys(e).length === 0;
   }
 
-  function save() {
+  async function save() {
     if (!validate()) return;
-    if (editingId) {
-      setItems((prev) =>
-        prev.map((c) => (c.id === editingId ? { ...c, ...draft } : c)),
-      );
-    } else {
-      const newCourse: Course = { id: `cr-${Date.now()}`, ...draft };
-      setItems((prev) => [newCourse, ...prev]);
-    }
-    setModalOpen(false);
+    try {
+      const url = editingId ? `/api/courses/${editingId}` : "/api/courses";
+      const method = editingId ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(draft) });
+      const j = await res.json();
+      if (!j.success) { setErrors({ name: j.error || "Failed" }); return; }
+      await fetchList();
+      setModalOpen(false);
+    } catch { setErrors({ name: "Network error" }); }
   }
 
   function askDelete(id: string) {
@@ -124,8 +131,9 @@ export default function CoursesAdminPage() {
     setConfirmOpen(true);
   }
 
-  function confirmDelete() {
-    if (deleteId) setItems((prev) => prev.filter((c) => c.id !== deleteId));
+  async function confirmDelete() {
+    if (!deleteId) return;
+    try { const r = await fetch(`/api/courses/${deleteId}`, { method: "DELETE" }); const j = await r.json(); if (j.success) await fetchList(); } catch {}
     setDeleteId(null);
   }
 

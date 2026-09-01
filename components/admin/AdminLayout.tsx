@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   Award,
   BookOpen,
+  FileText,
   Star,
   Image as ImageIcon,
   Trophy,
@@ -27,6 +28,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/students", label: "Students", icon: Users },
   { href: "/admin/certificates", label: "Certificates", icon: Award },
+  { href: "/admin/marksheets", label: "Marksheets", icon: FileText },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon },
@@ -41,6 +43,7 @@ const TITLES: Record<string, string> = {
   "/admin": "Dashboard",
   "/admin/students": "Students",
   "/admin/certificates": "Certificates",
+  "/admin/marksheets": "Marksheets",
   "/admin/courses": "Courses",
   "/admin/testimonials": "Testimonials",
   "/admin/banners": "Banners",
@@ -53,8 +56,20 @@ const TITLES: Record<string, string> = {
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+
+  // Don't show admin chrome on login page
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/admin/login");
+    router.refresh();
+  }
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
@@ -191,6 +206,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
           <button
             type="button"
+            onClick={handleLogout}
             className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
             aria-label="Logout"
             title="Logout"

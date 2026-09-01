@@ -1,5 +1,6 @@
 import type { CertificateData } from "@/types/certificate";
 import { LogoEmblem } from "./DocumentParts";
+import { InstitutionBadges } from "./InstitutionBadges";
 import { WATERMARK_TEXT } from "./CertificateShell";
 
 const WIDTH = 794;
@@ -7,21 +8,26 @@ const HEIGHT = 1123;
 
 export function Marksheet({ data }: { data: CertificateData }) {
   const leftFields: { label: string; value: string }[] = [
-    { label: "Roll No. :", value: data.rollNo },
-    { label: "Name:", value: data.studentName },
-    { label: "Father's Name :", value: data.fatherName },
-    { label: "Course Code :", value: data.courseCode },
+    { label: "Roll No. :",           value: data.rollNo },
+    { label: "Name:",                value: data.studentName },
+    { label: "Father's Name :",      value: data.fatherName },
+    { label: "Course Code :",        value: data.courseCode },
     { label: "Date Of Completion :", value: data.completionDate },
-    { label: "Training Centre :", value: data.trainingCenter },
+    { label: "Training Centre :",    value: data.trainingCenter },
   ];
 
   const rightFields: { label: string; value: string }[] = [
     { label: "Enrollment No. :", value: data.enrollmentNo },
-    { label: "Mother Name :", value: data.motherName },
+    { label: "Mother Name :",    value: data.motherName },
     { label: "Course Duration :", value: data.courseDuration },
   ];
 
   const grades = ["A+", "A", "B", "C", "D"];
+
+  // Use student's profile photo if available, otherwise fall back to public avatar PNG
+  const photoSrc = data.photoUrl && data.photoUrl.trim() !== ""
+    ? data.photoUrl
+    : "/student-avatar.png";
 
   return (
     <div className="doc-shell" style={{ width: WIDTH, height: HEIGHT }}>
@@ -35,9 +41,7 @@ export function Marksheet({ data }: { data: CertificateData }) {
             <svg viewBox="0 0 200 200" className="seal-wm-svg">
               <circle cx="100" cy="100" r="96" className="seal-wm-outer" />
               <circle cx="100" cy="100" r="82" className="seal-wm-inner" />
-              <text x="100" y="106" className="seal-wm-text">
-                RCCACE
-              </text>
+              <text x="100" y="106" className="seal-wm-text">RCCACE</text>
             </svg>
           </div>
 
@@ -45,11 +49,12 @@ export function Marksheet({ data }: { data: CertificateData }) {
             <div className="doc-flow-top">
               <header className="doc-flow-header doc-flow-header-marks">
                 <div className="doc-header-center">
+                  {/* Arched institution name — increased font size for prominence */}
                   <svg className="doc-arch-flow" viewBox="-30 -70 960 320" aria-hidden="true">
                     <defs>
                       <path id="archPathMarks" d="M 20,250 A 470,250 0 0 1 880,250" fill="none" />
                     </defs>
-                    <text style={{ fontSize: 110 }} fill="#000000">
+                    <text style={{ fontSize: 130 }} fill="#000000">
                       <textPath
                         href="#archPathMarks"
                         startOffset="50%"
@@ -68,13 +73,23 @@ export function Marksheet({ data }: { data: CertificateData }) {
                   </div>
                 </div>
 
-                <div className="doc-photo" aria-hidden={data.photoUrl ? undefined : true}>
-                  {data.photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={data.photoUrl} alt="Student" />
-                  ) : (
-                    <span className="doc-photo-ph">PHOTO</span>
-                  )}
+                {/* Student photo — uses profile photo or student-avatar.png fallback */}
+                <div className="doc-photo">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photoSrc}
+                    alt="Student"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                    onError={(e) => {
+                      // If profile URL 404s, fall back to avatar
+                      (e.currentTarget as HTMLImageElement).src = "/student-avatar.png";
+                    }}
+                  />
                 </div>
               </header>
 
@@ -136,12 +151,7 @@ export function Marksheet({ data }: { data: CertificateData }) {
                 <tr className="doc-total-row">
                   <td className="doc-paper" />
                   <td className="doc-subject">TOTAL MARKS</td>
-                  <td />
-                  <td />
-                  <td />
-                  <td />
-                  <td />
-                  <td />
+                  <td /><td /><td /><td /><td /><td />
                 </tr>
               </tbody>
             </table>
@@ -158,12 +168,12 @@ export function Marksheet({ data }: { data: CertificateData }) {
               </div>
               <div className="doc-legend-boxes">
                 {grades.map((g) => (
-                  <div key={g} className="doc-legend-box">
-                    {g}
-                  </div>
+                  <div key={g} className="doc-legend-box">{g}</div>
                 ))}
               </div>
             </div>
+
+            <InstitutionBadges />
 
             <footer className="doc-flow-footer">
               <div className="doc-footer-left">

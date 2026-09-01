@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Trash2, Eye, MailOpen, Inbox } from "lucide-react";
 import type { ContactMessage } from "@/data/types";
-import { messages } from "@/data/messages";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchInput, SelectInput } from "@/components/ui/SearchInput";
 import { Badge } from "@/components/ui/Badge";
@@ -22,13 +21,16 @@ export default function MessagesPage() {
   const [viewTarget, setViewTarget] = useState<ContactMessage | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<ContactMessage | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(messages);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/messages", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const unreadCount = useMemo(
     () => items.filter((m) => m.status === "unread").length,
@@ -50,15 +52,23 @@ export default function MessagesPage() {
     });
   }, [items, query, statusFilter, tab]);
 
-  function markRead(m: ContactMessage) {
-    setItems((prev) =>
-      prev.map((x) => (x.id === m.id ? { ...x, status: "read" } : x))
-    );
+  async function markRead(m: ContactMessage) {
+    try {
+      const res = await fetch(`/api/messages/${m.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "read" }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update status"); return; }
+      await fetchList();
+    } catch { alert("Network error while updating message"); }
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleteTarget) return;
-    setItems((prev) => prev.filter((m) => m.id !== deleteTarget.id));
+    try {
+      const res = await fetch(`/api/messages/${deleteTarget.id}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting message"); }
     setDeleteTarget(null);
   }
 

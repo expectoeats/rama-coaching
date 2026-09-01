@@ -14,11 +14,16 @@ const TYPE_OPTIONS: { value: DocumentType; label: string; icon: typeof Award }[]
 export function CertificateForm({
   onGenerate,
   initialData,
+  fixedType,
 }: {
   onGenerate: (data: CertificateData) => void;
   initialData?: CertificateData;
+  fixedType?: DocumentType;
 }) {
-  const [data, setData] = useState<CertificateData>(initialData ?? SAMPLE_CERTIFICATE);
+  const [data, setData] = useState<CertificateData>(() => {
+    const base = initialData ?? SAMPLE_CERTIFICATE;
+    return fixedType ? { ...base, documentType: fixedType } : base;
+  });
   const [errors, setErrors] = useState<Partial<Record<keyof CertificateData, string>>>({});
   const [attempted, setAttempted] = useState(false);
 
@@ -28,6 +33,7 @@ export function CertificateForm({
   }
 
   function setDocumentType(type: DocumentType) {
+    if (fixedType) return;
     setData((prev) => ({ ...prev, documentType: type }));
   }
 
@@ -51,7 +57,13 @@ export function CertificateForm({
   }
 
   function handleReset() {
-    const fresh: CertificateData = { ...SAMPLE_CERTIFICATE, subjects: DEFAULT_SUBJECTS.map((s) => ({ ...s })) };
+    // Preserve certificateNumber from initialData — it is set by the page, not editable here
+    const fresh: CertificateData = {
+      ...SAMPLE_CERTIFICATE,
+      subjects: DEFAULT_SUBJECTS.map((s) => ({ ...s })),
+      certificateNumber: initialData?.certificateNumber ?? SAMPLE_CERTIFICATE.certificateNumber,
+      documentType: fixedType ?? SAMPLE_CERTIFICATE.documentType,
+    };
     setData(fresh);
     setErrors({});
     setAttempted(false);
@@ -66,25 +78,27 @@ export function CertificateForm({
         <p className="form-sub">Select a document type, then enter the details as they should appear.</p>
       </div>
 
-      <div className="type-toggle" role="tablist" aria-label="Document type">
-        {TYPE_OPTIONS.map((opt) => {
-          const Icon = opt.icon;
-          const active = data.documentType === opt.value;
-          return (
-            <button
-              key={opt.value}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              className={`type-option${active ? " type-option-active" : ""}`}
-              onClick={() => setDocumentType(opt.value)}
-            >
-              <Icon size={16} />
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
+      {!fixedType ? (
+        <div className="type-toggle" role="tablist" aria-label="Document type">
+          {TYPE_OPTIONS.map((opt) => {
+            const Icon = opt.icon;
+            const active = data.documentType === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={`type-option${active ? " type-option-active" : ""}`}
+                onClick={() => setDocumentType(opt.value)}
+              >
+                <Icon size={16} />
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       {attempted && hasErrors(errors) ? (
         <div className="form-alert" role="alert">
@@ -120,6 +134,37 @@ export function CertificateForm({
       <fieldset className="form-section">
         <legend className="form-section-title">Reference &amp; Issue</legend>
         <div className="form-grid">
+          {/* Certificate number — read-only, set by the system */}
+          <div style={{ gridColumn: "1 / -1" }}>
+            <label className="form-label" style={{ display: "block", marginBottom: 4, fontSize: 13, fontWeight: 600, color: "#374151" }}>
+              Certificate Number
+            </label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "#f8fafc",
+                border: "1px solid #e2e8f0",
+                borderRadius: 8,
+                padding: "8px 12px",
+                fontFamily: "monospace",
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#1F3354",
+                letterSpacing: "0.04em",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              {data.certificateNumber || "—"}
+              <span style={{ marginLeft: "auto", fontSize: 10, fontWeight: 500, color: "#94a3b8", fontFamily: "sans-serif", letterSpacing: 0 }}>
+                Auto-assigned · read-only
+              </span>
+            </div>
+          </div>
           <TextField name="slNo" label="Sl. No." placeholder="001" required value={data.slNo} error={errors.slNo} onChange={(e) => setField("slNo", e.target.value)} />
           <TextField name="rollNo" label="Roll No." placeholder="RCC/2026/001" required value={data.rollNo} error={errors.rollNo} onChange={(e) => setField("rollNo", e.target.value)} />
           <TextField name="enrollmentNo" label="Enrollment No." placeholder="RAMA-2026-001" required full value={data.enrollmentNo} error={errors.enrollmentNo} onChange={(e) => setField("enrollmentNo", e.target.value)} />

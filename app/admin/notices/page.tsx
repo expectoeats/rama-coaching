@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2, Eye, Megaphone, Upload, Download } from "lucide-react";
 import type { Notice } from "@/data/types";
-import { notices } from "@/data/notices";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SearchInput, SelectInput } from "@/components/ui/SearchInput";
 import { Badge } from "@/components/ui/Badge";
@@ -46,13 +45,16 @@ export default function NoticesPage() {
   const [deleteTarget, setDeleteTarget] = useState<Notice | null>(null);
   const [viewTarget, setViewTarget] = useState<Notice | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(notices);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/notices", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const filtered = useMemo(() => {
     return items.filter((n) => {
@@ -92,7 +94,7 @@ export default function NoticesPage() {
     setModalOpen(true);
   }
 
-  function handleSave() {
+  async function handleSave() {
     const nextErrors: { title?: string; description?: string } = {};
     if (!form.title.trim()) nextErrors.title = "Title is required";
     if (!form.description.trim()) nextErrors.description = "Description is required";
@@ -100,44 +102,41 @@ export default function NoticesPage() {
       setErrors(nextErrors);
       return;
     }
-    if (editing) {
-      setItems((prev) =>
-        prev.map((n) =>
-          n.id === editing.id
-            ? {
-                id: n.id,
-                title: form.title.trim(),
-                description: form.description.trim(),
-                date: form.date,
-                priority: form.priority,
-                published: form.published,
-              }
-            : n
-        )
-      );
-    } else {
-      const newItem: Notice = {
-        id: `n-${Date.now()}`,
-        title: form.title.trim(),
-        description: form.description.trim(),
-        date: form.date,
-        priority: form.priority,
-        published: form.published,
-      };
-      setItems((prev) => [newItem, ...prev]);
-    }
-    setModalOpen(false);
+    const payload = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      date: form.date,
+      priority: form.priority,
+      published: form.published,
+    };
+    try {
+      const url = editing ? `/api/notices/${editing.id}` : "/api/notices";
+      const method = editing ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to save notice"); return; }
+      await fetchList();
+      setModalOpen(false);
+    } catch { alert("Network error while saving notice"); }
   }
 
-  function togglePublish(n: Notice) {
-    setItems((prev) =>
-      prev.map((x) => (x.id === n.id ? { ...x, published: !x.published } : x))
-    );
+  async function togglePublish(n: Notice) {
+    try {
+      const res = await fetch(`/api/notices/${n.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ published: !n.published }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update"); return; }
+      await fetchList();
+    } catch { alert("Network error while updating notice"); }
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleteTarget) return;
-    setItems((prev) => prev.filter((n) => n.id !== deleteTarget.id));
+    try {
+      const res = await fetch(`/api/notices/${deleteTarget.id}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting notice"); }
     setDeleteTarget(null);
   }
 

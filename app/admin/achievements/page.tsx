@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Achievement } from "@/data/types";
-import { achievements } from "@/data/achievements";
 
 const ICON_MAP: Record<string, LucideIcon> = {
   Users,
@@ -65,13 +64,16 @@ export default function AchievementsPage() {
   const [errors, setErrors] = useState<{ value?: string; label?: string }>({});
   const [deleteTarget, setDeleteTarget] = useState<Achievement | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(achievements);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/achievements", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const filtered = useMemo(() => {
     return items.filter((a) => {
@@ -107,7 +109,7 @@ export default function AchievementsPage() {
     setModalOpen(true);
   }
 
-  function handleSave() {
+  async function handleSave() {
     const nextErrors: { value?: string; label?: string } = {};
     if (!form.value.trim()) nextErrors.value = "Value is required";
     if (!form.label.trim()) nextErrors.label = "Label is required";
@@ -115,38 +117,32 @@ export default function AchievementsPage() {
       setErrors(nextErrors);
       return;
     }
-    if (editing) {
-      setItems((prev) =>
-        prev.map((a) =>
-          a.id === editing.id
-            ? {
-                id: a.id,
-                value: form.value.trim(),
-                label: form.label.trim(),
-                description: form.description.trim(),
-                icon: form.icon.trim() || "Star",
-                status: form.status,
-              }
-            : a
-        )
-      );
-    } else {
-      const newItem: Achievement = {
-        id: `a-${Date.now()}`,
-        value: form.value.trim(),
-        label: form.label.trim(),
-        description: form.description.trim(),
-        icon: form.icon.trim() || "Star",
-        status: form.status,
-      };
-      setItems((prev) => [newItem, ...prev]);
-    }
-    setModalOpen(false);
+    const payload = {
+      value: form.value.trim(),
+      label: form.label.trim(),
+      description: form.description.trim(),
+      icon: form.icon.trim() || "Star",
+      status: form.status,
+    };
+    try {
+      const url = editing ? `/api/achievements/${editing.id}` : "/api/achievements";
+      const method = editing ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to save achievement"); return; }
+      await fetchList();
+      setModalOpen(false);
+    } catch { alert("Network error while saving achievement"); }
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleteTarget) return;
-    setItems((prev) => prev.filter((a) => a.id !== deleteTarget.id));
+    try {
+      const res = await fetch(`/api/achievements/${deleteTarget.id}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting achievement"); }
     setDeleteTarget(null);
   }
 

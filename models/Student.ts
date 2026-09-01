@@ -12,6 +12,8 @@ export interface IStudent extends Document {
   admissionDate: Date;
   status: "active" | "completed" | "pending" | "inactive";
   avatarColor: string;
+  photoUrl?: string;
+  passwordHash?: string;
   deletedAt?: Date;
 }
 
@@ -28,6 +30,8 @@ const StudentSchema = new Schema<IStudent>(
     admissionDate: { type: Date, required: true },
     status: { type: String, enum: ["active", "completed", "pending", "inactive"], default: "active" },
     avatarColor: { type: String, default: "#1F3354" },
+    photoUrl: { type: String, default: "" },
+    passwordHash: { type: String, select: false },
     deletedAt: { type: Date },
   },
   { timestamps: true }

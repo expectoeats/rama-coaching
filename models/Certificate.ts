@@ -37,6 +37,7 @@ export interface ICertificate extends Document {
   dated: string;
   place: string;
   subjects?: IMarkRow[];
+  isSentToStudent: boolean;
   deletedAt?: Date;
 }
 
@@ -81,6 +82,7 @@ const CertificateSchema = new Schema<ICertificate>(
     dated: { type: String, required: true },
     place: { type: String, required: true },
     subjects: { type: [MarkRowSchema], default: [] },
+    isSentToStudent: { type: Boolean, default: false },
     deletedAt: { type: Date },
   },
   { timestamps: true }

@@ -65,6 +65,7 @@ export const DEFAULT_SUBJECTS: MarkRow[] = [
 
 export const SAMPLE_CERTIFICATE: CertificateData = {
   documentType: "excellence",
+  certificateNumber: "RCC-2026-0001",
   slNo: "001",
   rollNo: "RCC/2026/001",
   enrollmentNo: "RAMA-2026-001",

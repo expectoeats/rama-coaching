@@ -72,7 +72,7 @@ export default function SiteNav() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/admin"
+              href="/login"
               className="hidden md:inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-md font-semibold text-sm shadow-sm gap-2"
             >
               <Users className="w-4 h-4" /> Student Login / Register
@@ -125,7 +125,7 @@ export default function SiteNav() {
                 </Link>
               ))}
               <Link
-                href="/admin"
+                href="/login"
                 onClick={() => setOpen(false)}
                 className="mt-4 inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-md font-semibold text-sm shadow-sm gap-2"
               >

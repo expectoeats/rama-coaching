@@ -1,7 +1,14 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Send } from "lucide-react";
 import { Modal } from "./Modal";
+
+type Variant = "danger" | "primary";
+
+const variantStyles: Record<Variant, string> = {
+  danger: "bg-red-600 hover:bg-red-700 text-white",
+  primary: "bg-[#1F3354] hover:bg-[#162540] text-white",
+};
 
 export function ConfirmDialog({
   open,
@@ -9,8 +16,10 @@ export function ConfirmDialog({
   onConfirm,
   title = "Are you sure?",
   message,
-  confirmText = "Delete",
+  confirmText = "Confirm",
   cancelText = "Cancel",
+  variant = "danger",
+  icon,
 }: {
   open: boolean;
   onClose: () => void;
@@ -19,7 +28,19 @@ export function ConfirmDialog({
   message?: string;
   confirmText?: string;
   cancelText?: string;
+  variant?: Variant;
+  icon?: React.ReactNode;
 }) {
+  const defaultIcon =
+    variant === "primary" ? (
+      <Send className="h-5 w-5" />
+    ) : (
+      <AlertTriangle className="h-5 w-5" />
+    );
+
+  const iconBg =
+    variant === "primary" ? "bg-blue-100 text-blue-700" : "bg-red-100 text-red-600";
+
   return (
     <Modal
       open={open}
@@ -41,7 +62,7 @@ export function ConfirmDialog({
               onConfirm();
               onClose();
             }}
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${variantStyles[variant]}`}
           >
             {confirmText}
           </button>
@@ -49,8 +70,8 @@ export function ConfirmDialog({
       }
     >
       <div className="flex gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
-          <AlertTriangle className="h-5 w-5" />
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
+          {icon ?? defaultIcon}
         </div>
         <p className="text-sm text-slate-600">{message}</p>
       </div>

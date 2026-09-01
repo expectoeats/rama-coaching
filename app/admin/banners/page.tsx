@@ -12,7 +12,7 @@ import { Field, TextInput, TextArea } from "@/components/ui/Field";
 import { EmptyState, Spinner } from "@/components/ui/EmptyState";
 import { boolStatusVariant } from "@/lib/status";
 
-import { banners as seedBanners } from "@/data/banners";
+// banners loaded from API
 import type { Banner } from "@/data/types";
 
 type BannerDraft = Omit<Banner, "id">;
@@ -40,13 +40,16 @@ export default function BannersAdminPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setItems(seedBanners);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(t);
-  }, []);
+  const fetchList = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/banners", { cache: "no-store" });
+      const j = await res.json();
+      if (j.success) setItems(j.data);
+    } catch {}
+    setLoading(false);
+  };
+  useEffect(() => { fetchList(); }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -96,23 +99,28 @@ export default function BannersAdminPage() {
     return Object.keys(e).length === 0;
   }
 
-  function save() {
+  async function save() {
     if (!validate()) return;
-    if (editingId) {
-      setItems((prev) =>
-        prev.map((b) => (b.id === editingId ? { ...b, ...draft } : b)),
-      );
-    } else {
-      const newItem: Banner = { id: `b-${Date.now()}`, ...draft };
-      setItems((prev) => [newItem, ...prev]);
-    }
-    setModalOpen(false);
+    try {
+      const url = editingId ? `/api/banners/${editingId}` : "/api/banners";
+      const method = editingId ? "PUT" : "POST";
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(draft) });
+      const j = await res.json();
+      if (!j.success) { setErrors({ heading: j.error || "Failed to save" }); alert(j.error || "Failed to save banner"); return; }
+      await fetchList();
+      setModalOpen(false);
+    } catch { alert("Network error while saving banner"); }
   }
 
-  function toggleActive(id: string) {
-    setItems((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, active: !b.active } : b)),
-    );
+  async function toggleActive(id: string) {
+    const target = items.find((b) => b.id === id);
+    if (!target) return;
+    try {
+      const res = await fetch(`/api/banners/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !target.active }) });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to update"); return; }
+      await fetchList();
+    } catch { alert("Network error while updating banner"); }
   }
 
   function askDelete(id: string) {
@@ -120,8 +128,14 @@ export default function BannersAdminPage() {
     setConfirmOpen(true);
   }
 
-  function confirmDelete() {
-    if (deleteId) setItems((prev) => prev.filter((b) => b.id !== deleteId));
+  async function confirmDelete() {
+    if (!deleteId) return;
+    try {
+      const res = await fetch(`/api/banners/${deleteId}`, { method: "DELETE" });
+      const j = await res.json();
+      if (!j.success) { alert(j.error || "Failed to delete"); return; }
+      await fetchList();
+    } catch { alert("Network error while deleting banner"); }
     setDeleteId(null);
   }
 

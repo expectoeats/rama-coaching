@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import Link from "next/link";
 import { Building2, Award, Users, TrendingUp, Check, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
@@ -11,30 +10,40 @@ function FranchiseForm() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", state: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+
   const handle = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       const res = await fetch("/api/franchise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
       const j = await res.json();
-      if (j.success) { setDone(true); setForm({ name: "", email: "", phone: "", city: "", state: "", message: "" }); setTimeout(()=>setDone(false),4000); }
-      else alert(j.error||"Failed");
+      if (j.success) { setDone(true); setForm({ name: "", email: "", phone: "", city: "", state: "", message: "" }); setTimeout(() => setDone(false), 4000); }
+      else alert(j.error || "Failed");
     } catch { alert("Network error"); } finally { setLoading(false); }
   };
+
+  const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none";
+
   return (
     <form onSubmit={handle} className="space-y-4">
-      {done && <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">Application submitted successfully! We will contact you soon.</div>}
+      {done && (
+        <div className="bg-green-50 border border-green-200 rounded px-4 py-3 flex items-center gap-2 text-sm text-green-800">
+          <Check className="w-4 h-4 shrink-0" /> Application submitted. We will contact you soon.
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input required placeholder="Full Name *" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
-        <input required type="email" placeholder="Email *" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+        <input required placeholder="Full Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inputClass} />
+        <input required type="email" placeholder="Email *" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputClass} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input required placeholder="Phone *" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
-        <input required placeholder="City *" value={form.city} onChange={e=>setForm({...form,city:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+        <input required placeholder="Phone *" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputClass} />
+        <input required placeholder="City *" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className={inputClass} />
       </div>
-      <input required placeholder="State *" value={form.state} onChange={e=>setForm({...form,state:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
-      <textarea required placeholder="Tell us about yourself & location..." rows={4} value={form.message} onChange={e=>setForm({...form,message:e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" />
-      <button disabled={loading} type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg disabled:opacity-50">{loading?"Submitting...":"Submit Application"}</button>
+      <input required placeholder="State *" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className={inputClass} />
+      <textarea required placeholder="Tell us about yourself & location..." rows={4} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} className={inputClass} />
+      <button disabled={loading} type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded transition-colors text-sm disabled:opacity-50">
+        {loading ? "Submitting…" : "Submit Application"}
+      </button>
     </form>
   );
 }
@@ -44,128 +53,89 @@ export default function FranchisePage() {
     <div className="min-h-screen bg-white">
       <SiteNav />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-700 to-red-600 py-16">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-red-700 to-red-600 py-14">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Franchise Opportunity</h1>
-          <p className="text-xl text-red-100 mb-6">Join Our Growing Network of Computer Education Centers</p>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-white mb-3">Franchise Opportunity</h1>
+          <p className="text-base text-red-100 mb-6">Join Our Growing Network of Computer Education Centers</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">55+</div>
-              <div className="text-sm text-red-100">Active Centers</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">50+</div>
-              <div className="text-sm text-red-100">Districts Covered</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">100%</div>
-              <div className="text-sm text-red-100">Success Rate</div>
-            </div>
+            {[
+              { val: "55+", label: "Active Centers" },
+              { val: "50+", label: "Districts Covered" },
+              { val: "100%", label: "Success Rate" },
+            ].map((s) => (
+              <div key={s.label} className="bg-white/15 px-6 py-3 rounded">
+                <div className="text-2xl font-bold text-white">{s.val}</div>
+                <div className="text-xs text-red-100">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Why Partner With Us */}
-      <section className="py-16">
+      {/* Why Partner */}
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Partner With Rama Coaching Center?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-red-50 p-6 rounded-xl border-l-4 border-red-600">
-              <Building2 className="w-12 h-12 text-red-600 mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Established Brand</h3>
-              <p className="text-sm text-gray-600">10+ years of trusted brand recognition in computer education</p>
-            </div>
-            <div className="bg-blue-50 p-6 rounded-xl border-l-4 border-blue-600">
-              <Award className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Proven Model</h3>
-              <p className="text-sm text-gray-600">Tested business model with high success rate across UP</p>
-            </div>
-            <div className="bg-green-50 p-6 rounded-xl border-l-4 border-green-600">
-              <Users className="w-12 h-12 text-green-600 mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Full Support</h3>
-              <p className="text-sm text-gray-600">Complete training, marketing, and operational support</p>
-            </div>
-            <div className="bg-yellow-50 p-6 rounded-xl border-l-4 border-yellow-600">
-              <TrendingUp className="w-12 h-12 text-yellow-600 mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">High Returns</h3>
-              <p className="text-sm text-gray-600">Lucrative business opportunity with excellent ROI potential</p>
-            </div>
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-10">Why Partner With Rama Coaching Center?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { icon: Building2, color: "bg-red-50 border-red-200 text-red-600", title: "Established Brand", desc: "10+ years of trusted brand recognition in computer education" },
+              { icon: Award, color: "bg-blue-50 border-blue-200 text-blue-600", title: "Proven Model", desc: "Tested business model with high success rate across UP" },
+              { icon: Users, color: "bg-green-50 border-green-200 text-green-600", title: "Full Support", desc: "Complete training, marketing, and operational support" },
+              { icon: TrendingUp, color: "bg-yellow-50 border-yellow-200 text-yellow-600", title: "High Returns", desc: "Lucrative business opportunity with excellent ROI potential" },
+            ].map((item) => (
+              <div key={item.title} className={`p-6 rounded-xl border ${item.color.split(" ")[1]}`} style={{ background: "" }}>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${item.color.split(" ")[0]}`}>
+                  <item.icon className={`w-5 h-5 ${item.color.split(" ")[2]}`} />
+                </div>
+                <h3 className="font-medium text-gray-800 mb-1.5">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Benefits + Investment */}
+      <section className="py-14 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
             <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Franchise Benefits</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">Franchise Benefits</h2>
               <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Brand Recognition</h4>
-                    <p className="text-sm text-gray-600">Leverage our established brand name and reputation</p>
+                {[
+                  { title: "Brand Recognition", desc: "Leverage our established brand name and reputation" },
+                  { title: "Complete Training", desc: "Comprehensive training for center management and faculty" },
+                  { title: "Marketing Support", desc: "Marketing materials, advertising strategies, and promotional support" },
+                  { title: "Curriculum & Study Material", desc: "Access to updated curriculum and comprehensive study materials" },
+                  { title: "Technical Support", desc: "Ongoing technical support and software assistance" },
+                  { title: "Student Management System", desc: "Access to our proprietary student management and verification system" },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-gray-800 text-sm">{item.title}</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">{item.desc}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Complete Training</h4>
-                    <p className="text-sm text-gray-600">Comprehensive training for center management and faculty</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Marketing Support</h4>
-                    <p className="text-sm text-gray-600">Marketing materials, advertising strategies, and promotional support</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Curriculum & Study Material</h4>
-                    <p className="text-sm text-gray-600">Access to updated curriculum and comprehensive study materials</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Technical Support</h4>
-                    <p className="text-sm text-gray-600">Ongoing technical support and software assistance</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h4 className="font-bold text-gray-800">Student Management System</h4>
-                    <p className="text-sm text-gray-600">Access to our proprietary student management and verification system</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-red-600 to-red-700 p-8 rounded-2xl text-white">
-              <h3 className="text-2xl font-bold mb-6">Investment Details</h3>
-              <div className="space-y-4">
-                <div className="bg-white/10 p-4 rounded-lg">
-                  <div className="text-sm text-red-100">Franchise Fee</div>
-                  <div className="text-2xl font-bold">₹50,000 - ₹1,00,000</div>
-                </div>
-                <div className="bg-white/10 p-4 rounded-lg">
-                  <div className="text-sm text-red-100">Infrastructure Investment</div>
-                  <div className="text-2xl font-bold">₹2,00,000 - ₹5,00,000</div>
-                </div>
-                <div className="bg-white/10 p-4 rounded-lg">
-                  <div className="text-sm text-red-100">Expected ROI</div>
-                  <div className="text-2xl font-bold">40% - 60% annually</div>
-                </div>
-                <div className="bg-white/10 p-4 rounded-lg">
-                  <div className="text-sm text-red-100">Break-even Period</div>
-                  <div className="text-2xl font-bold">6 - 12 months</div>
-                </div>
+            <div className="bg-gradient-to-br from-red-600 to-red-700 p-7 rounded-xl text-white">
+              <h3 className="text-xl font-semibold mb-5">Investment Details</h3>
+              <div className="space-y-3">
+                {[
+                  { label: "Franchise Fee", val: "₹50,000 – ₹1,00,000" },
+                  { label: "Infrastructure Investment", val: "₹2,00,000 – ₹5,00,000" },
+                  { label: "Expected ROI", val: "40% – 60% annually" },
+                  { label: "Break-even Period", val: "6 – 12 months" },
+                ].map((item) => (
+                  <div key={item.label} className="bg-white/10 px-4 py-3 rounded">
+                    <div className="text-xs text-red-100 mb-0.5">{item.label}</div>
+                    <div className="text-lg font-semibold">{item.val}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -173,99 +143,67 @@ export default function FranchisePage() {
       </section>
 
       {/* Requirements */}
-      <section className="py-16">
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Franchise Requirements</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
-                <Building2 className="w-6 h-6 text-red-600" />
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-10">Franchise Requirements</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: Building2, color: "bg-red-100 text-red-600", title: "Space Requirement", desc: "Minimum 500 sq. ft. commercial space in prime location" },
+              { icon: Users, color: "bg-blue-100 text-blue-600", title: "Staff Requirements", desc: "Minimum 2–3 qualified instructors and 1 administrative staff" },
+              { icon: Award, color: "bg-green-100 text-green-600", title: "Infrastructure", desc: "15–20 computers, internet connection, basic furniture" },
+              { icon: TrendingUp, color: "bg-yellow-100 text-yellow-600", title: "Investment Capacity", desc: "Minimum investment of ₹3–5 lakhs including franchise fee" },
+              { icon: Phone, color: "bg-purple-100 text-purple-600", title: "Business Experience", desc: "Prior business or educational experience preferred" },
+              { icon: Award, color: "bg-pink-100 text-pink-600", title: "Commitment", desc: "Full-time commitment to run and manage the center" },
+            ].map((item) => (
+              <div key={item.title} className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <div className={`w-10 h-10 ${item.color} rounded-lg flex items-center justify-center mb-3`}>
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-medium text-gray-800 mb-1.5">{item.title}</h3>
+                <p className="text-sm text-gray-500">{item.desc}</p>
               </div>
-              <h3 className="font-bold text-gray-800 mb-2">Space Requirement</h3>
-              <p className="text-sm text-gray-600">Minimum 500 sq. ft. commercial space in prime location</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Staff Requirements</h3>
-              <p className="text-sm text-gray-600">Minimum 2-3 qualified instructors and 1 administrative staff</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Infrastructure</h3>
-              <p className="text-sm text-gray-600">15-20 computers, internet connection, basic furniture</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-yellow-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Investment Capacity</h3>
-              <p className="text-sm text-gray-600">Minimum investment of ₹3-5 lakhs including franchise fee</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Phone className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Business Experience</h3>
-              <p className="text-sm text-gray-600">Prior business or educational experience preferred</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-pink-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Commitment</h3>
-              <p className="text-sm text-gray-600">Full-time commitment to run and manage the center</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Franchise Application Form */}
-      <section className="py-16 bg-gray-50">
+      {/* Application Form */}
+      <section className="py-14 bg-gray-50">
         <div className="max-w-2xl mx-auto px-6">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Apply for Franchise</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">Apply for Franchise</h2>
             <FranchiseForm />
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-red-700 to-red-600">
+      {/* CTA */}
+      <section className="py-14 bg-gradient-to-r from-red-700 to-red-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Own Computer Education Center?</h2>
-          <p className="text-xl text-red-100 mb-8">Join our successful franchise network and become part of the computer education revolution</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="tel:08299121689" className="px-8 py-3 bg-yellow-500 text-gray-900 rounded-lg font-bold hover:bg-yellow-600 transition-colors">
-              Call: 08299121689
-            </Link>
-          </div>
+          <h2 className="text-2xl font-semibold text-white mb-3">Ready to Start Your Own Computer Education Center?</h2>
+          <p className="text-base text-red-100 mb-7">Join our successful franchise network and become part of the computer education revolution</p>
+          <Link href="tel:08299121689" className="inline-flex items-center px-7 py-3 bg-yellow-500 text-gray-900 rounded font-medium hover:bg-yellow-600 transition-colors">
+            Call: 08299121689
+          </Link>
         </div>
       </section>
 
-      {/* Contact Information */}
-      <section className="py-16">
+      {/* Contact info */}
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Contact Us for Franchise Inquiry</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <Phone className="w-12 h-12 text-red-600 mx-auto mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Phone</h3>
-              <Link href="tel:08299121689" className="text-red-600 hover:text-red-700 transition-colors">08299121689</Link>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <Mail className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Email</h3>
-              <Link href="mailto:franchise@ramacoaching.com" className="text-red-600 hover:text-red-700 transition-colors">franchise@ramacoaching.com</Link>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md text-center">
-              <MapPin className="w-12 h-12 text-green-600 mx-auto mb-4" />
-              <h3 className="font-bold text-gray-800 mb-2">Address</h3>
-              <p className="text-gray-600">Fatehpur, Uttar Pradesh 212601</p>
-            </div>
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-10">Contact Us for Franchise Inquiry</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {[
+              { icon: Phone, color: "text-red-600", title: "Phone", content: <Link href="tel:08299121689" className="text-red-600 hover:text-red-700 text-sm">08299121689</Link> },
+              { icon: Mail, color: "text-blue-600", title: "Email", content: <Link href="mailto:franchise@ramacoaching.com" className="text-red-600 hover:text-red-700 text-sm break-all">franchise@ramacoaching.com</Link> },
+              { icon: MapPin, color: "text-green-600", title: "Address", content: <p className="text-gray-500 text-sm">Fatehpur, Uttar Pradesh 212601</p> },
+            ].map((item) => (
+              <div key={item.title} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                <item.icon className={`w-10 h-10 ${item.color} mx-auto mb-3`} />
+                <h3 className="font-medium text-gray-800 mb-2">{item.title}</h3>
+                {item.content}
+              </div>
+            ))}
           </div>
         </div>
       </section>

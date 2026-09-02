@@ -44,6 +44,11 @@ export const courseStatusVariant: Record<"active" | "inactive", BadgeVariant> = 
   inactive: "neutral",
 };
 
+export const mockTestStatusVariant: Record<"active" | "inactive", BadgeVariant> = {
+  active: "success",
+  inactive: "neutral",
+};
+
 export const boolStatusVariant = (published: boolean): BadgeVariant =>
   published ? "success" : "neutral";
 

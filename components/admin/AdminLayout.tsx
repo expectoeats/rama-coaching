@@ -22,6 +22,7 @@ import {
   LogOut,
   ExternalLink,
   ChevronDown,
+  ClipboardList,
 } from "lucide-react";
 
 const NAV = [
@@ -30,6 +31,7 @@ const NAV = [
   { href: "/admin/certificates", label: "Certificates", icon: Award },
   { href: "/admin/marksheets", label: "Marksheets", icon: FileText },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
+  { href: "/admin/mock-tests", label: "Mock Tests", icon: ClipboardList },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon },
   { href: "/admin/achievements", label: "Achievements", icon: Trophy },
@@ -45,6 +47,7 @@ const TITLES: Record<string, string> = {
   "/admin/certificates": "Certificates",
   "/admin/marksheets": "Marksheets",
   "/admin/courses": "Courses",
+  "/admin/mock-tests": "Mock Tests",
   "/admin/testimonials": "Testimonials",
   "/admin/banners": "Banners",
   "/admin/achievements": "Achievements",

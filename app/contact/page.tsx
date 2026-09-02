@@ -2,18 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Phone, Mail, MapPin, Clock, Send, Check, Building2, Users } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, Check } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: ""
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -54,129 +48,85 @@ export default function ContactPage() {
     <div className="min-h-screen bg-white">
       <SiteNav />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-700 to-red-600 py-16">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-red-700 to-red-600 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact Us</h1>
-          <p className="text-xl text-red-100 mb-6">Get in Touch with Rama Coaching Center</p>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-white mb-3">Contact Us</h1>
+          <p className="text-base text-red-100 mb-6">Get in Touch with Rama Coaching Center</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">24/7</div>
-              <div className="text-sm text-red-100">Support Available</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">Quick</div>
-              <div className="text-sm text-red-100">Response Time</div>
-            </div>
-            <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-lg">
-              <div className="text-2xl font-bold text-white">Free</div>
-              <div className="text-sm text-red-100">Consultation</div>
-            </div>
+            {[
+              { val: "24/7", label: "Support Available" },
+              { val: "Quick", label: "Response Time" },
+              { val: "Free", label: "Consultation" },
+            ].map((s) => (
+              <div key={s.label} className="bg-white/15 px-6 py-3 rounded">
+                <div className="text-xl font-semibold text-white">{s.val}</div>
+                <div className="text-xs text-red-100">{s.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Contact Information */}
-      <section className="py-16">
+      {/* Contact info cards */}
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 text-center">
-              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-7 h-7 text-red-600" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { icon: Phone, color: "bg-red-50 text-red-600", title: "Phone", content: <Link href="tel:08299121689" className="text-red-600 hover:text-red-700 text-sm">08299121689</Link>, sub: "Mon–Sat, 9AM–6PM" },
+              { icon: Mail, color: "bg-blue-50 text-blue-600", title: "Email", content: <Link href="mailto:info@ramacoaching.com" className="text-red-600 hover:text-red-700 text-sm">info@ramacoaching.com</Link>, sub: "Reply within 24 hours" },
+              { icon: MapPin, color: "bg-green-50 text-green-600", title: "Address", content: <p className="text-gray-600 text-sm">UPHC, Andauli Puliya, Ghazipur Rd, Fatehpur, UP 212601</p>, sub: "" },
+              { icon: Clock, color: "bg-yellow-50 text-yellow-600", title: "Working Hours", content: <p className="text-gray-600 text-sm">Mon–Sat: 9:00 AM – 6:00 PM</p>, sub: "Sunday: Closed" },
+            ].map((item) => (
+              <div key={item.title} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                <div className={`w-12 h-12 ${item.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h3 className="font-medium text-gray-800 mb-2">{item.title}</h3>
+                {item.content}
+                {item.sub && <p className="text-xs text-gray-400 mt-1">{item.sub}</p>}
               </div>
-              <h3 className="font-bold text-gray-800 mb-2">Phone</h3>
-              <Link href="tel:08299121689" className="text-red-600 hover:text-red-700 transition-colors">08299121689</Link>
-              <p className="text-sm text-gray-500 mt-1">Mon - Sat, 9AM - 6PM</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-7 h-7 text-blue-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Email</h3>
-              <Link href="mailto:info@ramacoaching.com" className="text-red-600 hover:text-red-700 transition-colors">info@ramacoaching.com</Link>
-              <p className="text-sm text-gray-500 mt-1">We reply within 24 hours</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 text-center">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-7 h-7 text-green-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Address</h3>
-              <p className="text-gray-600 text-sm">UPHC, Andauli Puliya, Ghazipur Rd, Radha Nagar, Harihar Ganj, Fatehpur, UP 212601</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 text-center">
-              <div className="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-7 h-7 text-yellow-600" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">Working Hours</h3>
-              <p className="text-gray-600 text-sm">Mon - Sat: 9:00 AM - 6:00 PM</p>
-              <p className="text-sm text-gray-500 mt-1">Sunday: Closed</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Contact Form */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-12 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Send us a Message</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">Send us a Message</h2>
 
             {submitted && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center gap-3">
-                <Check className="w-5 h-5 text-green-600" />
-                <p className="text-green-800">Thank you for your message! We'll get back to you soon.</p>
+              <div className="bg-green-50 border border-green-200 rounded px-4 py-3 mb-6 flex items-center gap-3">
+                <Check className="w-4 h-4 text-green-600 shrink-0" />
+                <p className="text-sm text-green-800">Message sent. We'll get back to you soon.</p>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter your full name"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
+                  <label className="block text-sm text-gray-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
+                  <input type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter your full name"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="Enter your email address"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
+                  <label className="block text-sm text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter your email"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none" />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your phone number"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  />
+                  <label className="block text-sm text-gray-700 mb-1.5">Phone Number</label>
+                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Your phone number"
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
-                  <select
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
+                  <label className="block text-sm text-gray-700 mb-1.5">Subject <span className="text-red-500">*</span></label>
+                  <select name="subject" value={formData.subject} onChange={handleChange} required
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none bg-white">
                     <option value="">Select a subject</option>
                     <option value="course-inquiry">Course Inquiry</option>
                     <option value="admission">Admission Query</option>
@@ -187,35 +137,17 @@ export default function ContactPage() {
                   </select>
                 </div>
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows={5}
-                  placeholder="Type your message here..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
-                />
+                <label className="block text-sm text-gray-700 mb-1.5">Message <span className="text-red-500">*</span></label>
+                <textarea name="message" value={formData.message} onChange={handleChange} required rows={5} placeholder="Type your message here..."
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none resize-none" />
               </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
+              <button type="submit" disabled={isSubmitting}
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-6 rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm">
                 {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Sending...
-                  </>
+                  <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Sending…</>
                 ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    Send Message
-                  </>
+                  <><Send className="w-4 h-4" />Send Message</>
                 )}
               </button>
             </form>
@@ -223,41 +155,35 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-16">
+      {/* Map placeholder */}
+      <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Find Us on Map</h2>
-          <div className="bg-gray-200 rounded-2xl overflow-hidden h-96 flex items-center justify-center">
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-8">Find Us on Map</h2>
+          <div className="bg-gray-100 rounded-xl overflow-hidden h-80 flex items-center justify-center border border-gray-200">
             <div className="text-center">
-              <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Interactive Map</p>
-              <p className="text-sm text-gray-500">UPHC, Andauli Puliya, Ghazipur Rd, Fatehpur, UP 212601</p>
+              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-500 text-sm">UPHC, Andauli Puliya, Ghazipur Rd, Fatehpur, UP 212601</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
+      {/* FAQ */}
+      <section className="py-12 bg-gray-50">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-bold text-gray-800 mb-2">What courses do you offer?</h3>
-              <p className="text-sm text-gray-600">We offer RSCIT, Tally Prime, Digital Marketing, RSCFA Accounting, ADCA/DCA Diploma, and Graphic Design courses.</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-bold text-gray-800 mb-2">What is the admission process?</h3>
-              <p className="text-sm text-gray-600">Visit our center, fill the admission form, submit required documents, and pay the course fee to get started.</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-bold text-gray-800 mb-2">Do you provide placement assistance?</h3>
-              <p className="text-sm text-gray-600">Yes, we provide career guidance and placement support to help students find suitable job opportunities.</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="font-bold text-gray-800 mb-2">Are your certificates government recognized?</h3>
-              <p className="text-sm text-gray-600">Yes, our certificates are government recognized and can be verified through our online verification system.</p>
-            </div>
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-8">Frequently Asked Questions</h2>
+          <div className="space-y-3">
+            {[
+              { q: "What courses do you offer?", a: "We offer RSCIT, Tally Prime, Digital Marketing, RSCFA Accounting, ADCA/DCA Diploma, and Graphic Design courses." },
+              { q: "How do I get admitted?", a: "Visit our center or call us at 08299121689. You can also fill the contact form above and we will guide you through the process." },
+              { q: "Do you provide placement assistance?", a: "Yes, we provide career guidance and job placement support to all our students after course completion." },
+              { q: "Are the certificates government recognized?", a: "Yes, all certificates issued by Rama Coaching Center are government recognized and verifiable online." },
+            ].map((item) => (
+              <div key={item.q} className="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
+                <h3 className="font-medium text-gray-800 mb-2">{item.q}</h3>
+                <p className="text-sm text-gray-500">{item.a}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

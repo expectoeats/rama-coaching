@@ -106,6 +106,28 @@ export interface FranchiseApplication {
   status: FranchiseStatus;
 }
 
+export interface MockTestQuestion {
+  id: string;
+  questionText: string;
+  options: string[]; // exactly 4
+  correctOption: number; // 0-indexed
+  explanation: string;
+  marks: number;
+}
+
+export interface MockTest {
+  id: string;
+  title: string;
+  description: string;
+  subject: string;
+  duration: number; // minutes
+  totalMarks: number;
+  passingMarks: number;
+  questions: MockTestQuestion[];
+  status: "active" | "inactive";
+  attemptLimit: number;
+}
+
 export interface InstituteSettings {
   instituteName: string;
   phone: string;

@@ -56,7 +56,7 @@ export async function GET(req: Request) {
         // Strip correctOption and explanation from each question for public listing
         return {
           ...s,
-          questions: s.questions.map(({ correctOption: _c, explanation: _e, ...rest }) => rest),
+          questions: s.questions.map(({ correctOption: _c, explanation: _e, ...rest }: { correctOption: number; explanation: string; [key: string]: unknown }) => rest),
         };
       }
       return s;

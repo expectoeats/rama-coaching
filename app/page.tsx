@@ -354,22 +354,59 @@ export default function HomePage() {
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-red-600 text-white p-8 rounded-xl">
-              <Building2 className="w-10 h-10 mb-4 opacity-80" />
-              <h3 className="text-xl font-semibold mb-2">Join Our Franchise Network</h3>
-              <p className="text-sm text-red-100 mb-5">Start your own computer education center with our proven franchise model.</p>
-              <Link href="/franchise" className="inline-flex items-center bg-white text-red-600 px-5 py-2 rounded font-medium text-sm hover:bg-gray-50 transition-colors">
-                Apply Now <ArrowRight className="w-4 h-4 ml-1.5" />
-              </Link>
+
+            {/* Franchise Card */}
+            <div className="relative overflow-hidden bg-red-600 text-white" style={{ minHeight: 220 }}>
+              {/* Background image */}
+              <img
+                src="https://lakshaygroupedu.co.in/assets/images/achive/01.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute right-0 bottom-0 h-full w-auto max-w-[55%] object-contain object-bottom opacity-20 pointer-events-none select-none"
+              />
+              {/* Content */}
+              <div className="relative z-10 p-7 sm:p-8 flex flex-col h-full">
+                <p className="text-[11px] uppercase tracking-widest text-red-200 mb-3">Grow with us</p>
+                <h3 className="text-xl font-semibold leading-snug mb-2">Join Our Franchise Network</h3>
+                <p className="text-sm text-red-100 leading-relaxed mb-6 max-w-xs">
+                  Start your own computer education center with our proven franchise model. 55+ centers across UP.
+                </p>
+                <div className="mt-auto">
+                  <Link href="/franchise" className="inline-flex items-center bg-white text-red-600 px-5 py-2 text-sm hover:bg-red-50 transition-colors">
+                    Apply Now <ArrowRight className="w-4 h-4 ml-1.5" />
+                  </Link>
+                </div>
+              </div>
+              {/* Decorative image — visible, right side */}
+              <img
+                src="https://lakshaygroupedu.co.in/assets/images/achive/01.png"
+                alt="Franchise"
+                className="absolute right-4 bottom-0 h-[90%] w-auto max-w-[45%] object-contain object-bottom pointer-events-none select-none"
+              />
             </div>
-            <div className="bg-[#1F3354] text-white p-8 rounded-xl">
-              <Award className="w-10 h-10 mb-4 opacity-80" />
-              <h3 className="text-xl font-semibold mb-2">Student Verification System</h3>
-              <p className="text-sm text-slate-300 mb-5">Verify the authenticity of student certificates issued by our center.</p>
-              <Link href="/verification" className="inline-flex items-center bg-white text-[#1F3354] px-5 py-2 rounded font-medium text-sm hover:bg-gray-50 transition-colors">
-                Verify Now <ArrowRight className="w-4 h-4 ml-1.5" />
-              </Link>
+
+            {/* Verification Card */}
+            <div className="relative overflow-hidden bg-[#1F3354] text-white" style={{ minHeight: 220 }}>
+              <div className="relative z-10 p-7 sm:p-8 flex flex-col h-full">
+                <p className="text-[11px] uppercase tracking-widest text-slate-400 mb-3">Instant verification</p>
+                <h3 className="text-xl font-semibold leading-snug mb-2">Student Verification System</h3>
+                <p className="text-sm text-slate-300 leading-relaxed mb-6 max-w-xs">
+                  Verify the authenticity of student certificates issued by our center — online, instantly.
+                </p>
+                <div className="mt-auto">
+                  <Link href="/verification" className="inline-flex items-center bg-white text-[#1F3354] px-5 py-2 text-sm hover:bg-slate-100 transition-colors">
+                    Verify Now <ArrowRight className="w-4 h-4 ml-1.5" />
+                  </Link>
+                </div>
+              </div>
+              {/* Decorative image — right side */}
+              <img
+                src="https://lakshaygroupedu.co.in/assets/images/achive/02.png"
+                alt="Verification"
+                className="absolute right-4 bottom-0 h-[90%] w-auto max-w-[45%] object-contain object-bottom pointer-events-none select-none"
+              />
             </div>
+
           </div>
         </div>
       </section>

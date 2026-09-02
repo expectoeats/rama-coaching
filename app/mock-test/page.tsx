@@ -30,54 +30,51 @@ export default function MockTestListPage() {
     <>
       <SiteNav />
 
-      {/* ── Hero — banner image with right-side overlay ──────────────────────── */}
+      {/* ── Hero — banner with right-side overlay on all screens ─────────────── */}
       <section className="relative w-full">
         <img
           src="/test-bg.png"
           alt="Free Mock Test"
           className="w-full object-cover"
         />
-        {/* Right-side overlay — semi-transparent card over the device/quiz area */}
-        <div className="absolute inset-y-0 right-0 flex w-[46%] items-center justify-center px-6 lg:px-14">
-          <div className="w-full rounded-xl border border-white/20 bg-black/40 px-6 py-7 text-right backdrop-blur-sm shadow-lg lg:px-8 lg:py-9">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-[0.18em] text-white/50 mb-2 hidden sm:block">
+        {/* Overlay — RIGHT side, all screen sizes */}
+        <div className="absolute inset-y-0 right-0 flex w-[52%] sm:w-[45%] lg:w-[38%] items-center px-4 sm:px-6 lg:px-10">
+          <div className="w-full bg-black/50 backdrop-blur-sm border border-white/15 px-4 py-4 sm:px-5 sm:py-5">
+            <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-white/50 mb-1.5 hidden sm:block">
               Rama Coaching Centre
             </p>
-            <h2 className="text-lg sm:text-2xl lg:text-3xl font-semibold text-white leading-snug">
-              Test Yourself.<br />
+            <h2 className="text-sm sm:text-base lg:text-xl font-semibold text-white leading-snug">
+              Test Yourself.{" "}
               <span className="text-yellow-400">Know Where You Stand.</span>
             </h2>
-            <p className="mt-3 text-[11px] sm:text-sm text-white/70 leading-relaxed hidden sm:block">
-              Free mock tests · Real exam patterns<br />
-              No registration · No fees
+            <p className="mt-1.5 text-[10px] sm:text-xs text-white/65 leading-relaxed hidden sm:block">
+              Free · No registration · Instant results
             </p>
-            <div className="mt-5 flex justify-end">
-              <a
-                href="#tests"
-                className="inline-flex items-center gap-2 rounded bg-red-600 hover:bg-red-700 px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-medium text-white transition-colors"
-              >
-                Browse Tests →
-              </a>
-            </div>
+            <a
+              href="#tests"
+              className="mt-3 inline-flex items-center bg-red-600 hover:bg-red-700 text-white text-[10px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2 transition-colors"
+            >
+              Browse Tests →
+            </a>
           </div>
         </div>
       </section>
 
       {/* ── How it works — compact strip ─────────────────────────────────────── */}
       <section className="border-y border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-6xl px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+        <div className="mx-auto max-w-6xl px-6 py-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
             {[
               { n: "1", title: "Pick a Test", desc: "Choose from our curated subject-wise mock tests." },
               { n: "2", title: "Answer Questions", desc: "Select from 4 options per question within the time limit." },
               { n: "3", title: "See Your Score", desc: "Get instant results with correct answers and explanations." },
             ].map((s) => (
-              <div key={s.n} className="flex items-start gap-4 px-6 py-4 sm:py-2 first:pl-0 last:pr-0">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-600 text-sm font-black text-white">
+              <div key={s.n} className="flex items-start gap-3 px-6 py-4 sm:py-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-600 text-xs font-medium text-white mt-0.5">
                   {s.n}
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-slate-800">{s.title}</p>
+                  <p className="text-sm font-medium text-slate-800">{s.title}</p>
                   <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">{s.desc}</p>
                 </div>
               </div>

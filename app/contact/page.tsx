@@ -155,15 +155,34 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Map placeholder */}
+      {/* Map */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl font-semibold text-center text-gray-800 mb-8">Find Us on Map</h2>
-          <div className="bg-gray-100 rounded-xl overflow-hidden h-80 flex items-center justify-center border border-gray-200">
-            <div className="text-center">
-              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">UPHC, Andauli Puliya, Ghazipur Rd, Fatehpur, UP 212601</p>
-            </div>
+          <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm h-80 sm:h-[420px]">
+            <iframe
+              src="https://maps.google.com/maps?q=VQXR%2BVH+Fatehpur,+Uttar+Pradesh&t=&z=17&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Rama Coaching Center Location"
+            />
+          </div>
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1">
+            <p className="text-sm text-gray-500">
+              UPHC, Andauli Puliya, Ghazipur Rd, Radha Nagar, Harihar Ganj, Fatehpur, UP 212601
+            </p>
+            <a
+              href="https://maps.google.com/?q=UPHC,+Andauli+Puliya,+Ghazipur+Rd,+Radha+Nagar,+Harihar+Ganj,+Fatehpur,+Uttar+Pradesh+212601"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-red-600 hover:text-red-700 whitespace-nowrap transition-colors"
+            >
+              Open in Google Maps →
+            </a>
           </div>
         </div>
       </section>

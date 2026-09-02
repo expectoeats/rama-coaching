@@ -164,8 +164,8 @@ export default function MockTestPage() {
         <SiteNav />
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
           <AlertTriangle className="h-12 w-12 text-amber-400" />
-          <p className="text-base font-semibold text-slate-700">{loadError}</p>
-          <Link href="/mock-test" className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">
+          <p className="text-base text-slate-700">{loadError}</p>
+          <Link href="/mock-test" className="inline-flex items-center gap-2 rounded bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700">
             <ArrowLeft className="h-4 w-4" /> Back to Tests
           </Link>
         </div>
@@ -190,17 +190,15 @@ export default function MockTestPage() {
           </div>
 
           <div className="mx-auto max-w-3xl px-4 py-10">
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
               {/* Header */}
               <div className="bg-[#1F3354] px-8 py-8 text-white">
-                <span className="inline-block rounded-md bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-200 mb-3">
+                <span className="inline-block rounded bg-white/15 px-3 py-1 text-xs uppercase tracking-wide text-slate-200 mb-3">
                   {test!.subject}
                 </span>
-                <h1 className="text-2xl font-black leading-tight">{test!.title}</h1>
+                <h1 className="text-xl font-semibold leading-snug">{test!.title}</h1>
                 <p className="mt-2 text-sm text-slate-300 max-w-lg">{test!.description}</p>
               </div>
-
               <div className="px-8 py-7">
                 {/* Stats grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7">
@@ -210,17 +208,16 @@ export default function MockTestPage() {
                     { icon: Target, label: "Total Marks", value: test!.totalMarks },
                     { icon: Trophy, label: "Pass Mark", value: test!.passingMarks },
                   ].map((s) => (
-                    <div key={s.label} className="flex flex-col gap-1.5 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                    <div key={s.label} className="flex flex-col gap-1.5 rounded border border-slate-100 bg-slate-50 p-4">
                       <s.icon className="h-4 w-4 text-red-600" />
-                      <p className="text-xl font-black text-slate-800">{s.value}</p>
+                      <p className="text-xl font-bold text-slate-800">{s.value}</p>
                       <p className="text-xs text-slate-500">{s.label}</p>
                     </div>
                   ))}
                 </div>
-
                 {/* Rules */}
                 <div className="mb-7">
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Instructions</p>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">Instructions</p>
                   <div className="space-y-2.5">
                     {[
                       "Each question has 4 answer choices — select the one you think is correct.",
@@ -230,7 +227,7 @@ export default function MockTestPage() {
                       "Correct answers and explanations are shown after submission.",
                     ].map((r, i) => (
                       <div key={i} className="flex items-start gap-3 text-sm text-slate-600">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-[10px] font-bold text-red-600 mt-0.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-100 text-[10px] font-medium text-red-600 mt-0.5">
                           {i + 1}
                         </span>
                         {r}
@@ -238,9 +235,8 @@ export default function MockTestPage() {
                     ))}
                   </div>
                 </div>
-
                 {test!.questions.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-200 py-10 text-center">
+                  <div className="rounded border border-dashed border-slate-200 py-10 text-center">
                     <HelpCircle className="mx-auto mb-2 h-8 w-8 text-slate-300" />
                     <p className="text-sm text-slate-400">No questions have been added to this test yet.</p>
                   </div>
@@ -248,7 +244,7 @@ export default function MockTestPage() {
                   <button
                     type="button"
                     onClick={startTest}
-                    className="w-full rounded-xl bg-red-600 py-3.5 text-sm font-bold text-white hover:bg-red-700 transition-colors shadow-sm"
+                    className="w-full rounded bg-red-600 py-3 text-sm font-medium text-white hover:bg-red-700 transition-colors"
                   >
                     Start Test →
                   </button>
@@ -276,14 +272,14 @@ export default function MockTestPage() {
           <div className="mx-auto max-w-3xl px-4 h-14 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <ClipboardList className="h-4 w-4 text-slate-400 shrink-0" />
-              <span className="text-sm font-semibold text-slate-800 truncate">{test!.title}</span>
+              <span className="text-sm text-slate-800 truncate">{test!.title}</span>
             </div>
             <div className="flex items-center gap-4 shrink-0">
               <div className="hidden sm:flex flex-col items-end">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wide">Progress</span>
-                <span className="text-xs font-bold text-slate-700">{answered}/{total} answered</span>
+                <span className="text-xs text-slate-700">{answered}/{total} answered</span>
               </div>
-              <div className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold tabular-nums ${
+              <div className={`flex items-center gap-1.5 rounded px-3 py-1.5 text-sm tabular-nums font-medium ${
                 warn ? "bg-red-100 text-red-700 animate-pulse" : "bg-slate-100 text-slate-700"
               }`}>
                 <Clock className="h-3.5 w-3.5" />
@@ -304,19 +300,17 @@ export default function MockTestPage() {
           <div className="mx-auto max-w-3xl px-4 space-y-5">
 
             {/* Question card */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
               <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-100 bg-slate-50">
-                <span className="text-xs font-semibold text-slate-500">
-                  Question <span className="text-slate-800">{currentQ + 1}</span> of {total}
+                <span className="text-xs text-slate-500">
+                  Question <span className="text-slate-700 font-medium">{currentQ + 1}</span> of {total}
                 </span>
-                <span className="text-xs font-semibold text-[#1F3354] bg-[#1F3354]/8 px-2.5 py-1 rounded-md">
+                <span className="text-xs text-[#1F3354] bg-[#1F3354]/8 px-2.5 py-1 rounded">
                   {q.marks} {q.marks === 1 ? "mark" : "marks"}
                 </span>
               </div>
-
               <div className="px-6 py-6">
-                <p className="text-base font-semibold leading-relaxed text-slate-800">{q.questionText}</p>
-
+                <p className="text-base leading-relaxed text-slate-800">{q.questionText}</p>
                 <div className="mt-6 space-y-2.5">
                   {q.options.map((opt, i) => {
                     const sel = answers[q.id] === i;
@@ -325,13 +319,13 @@ export default function MockTestPage() {
                         key={i}
                         type="button"
                         onClick={() => setAnswers({ ...answers, [q.id]: i })}
-                        className={`w-full flex items-center gap-4 rounded-xl border text-left px-4 py-3.5 text-sm transition-all ${
+                        className={`w-full flex items-center gap-4 rounded border text-left px-4 py-3 text-sm transition-all ${
                           sel
                             ? "border-red-500 bg-red-50 text-red-800"
                             : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
                         }`}
                       >
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded text-xs font-medium transition-colors ${
                           sel ? "bg-red-600 text-white" : "bg-slate-100 text-slate-500"
                         }`}>
                           {String.fromCharCode(65 + i)}
@@ -346,8 +340,8 @@ export default function MockTestPage() {
             </div>
 
             {/* Navigator */}
-            <div className="bg-white rounded-2xl border border-slate-200 px-5 py-4 shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Question Navigator</p>
+            <div className="bg-white rounded-xl border border-slate-200 px-5 py-4 shadow-sm">
+              <p className="text-[11px] uppercase tracking-widest text-slate-400 mb-3">Question Navigator</p>
               <div className="flex flex-wrap gap-1.5">
                 {test!.questions.map((qq, i) => {
                   const isAnswered = answers[qq.id] !== undefined;
@@ -357,7 +351,7 @@ export default function MockTestPage() {
                       key={qq.id}
                       type="button"
                       onClick={() => setCurrentQ(i)}
-                      className={`h-8 w-8 rounded-lg text-xs font-bold transition-all ${
+                      className={`h-8 w-8 rounded text-xs font-medium transition-all ${
                         isCurrent
                           ? "bg-[#1F3354] text-white ring-2 ring-[#1F3354]/30 ring-offset-1"
                           : isAnswered
@@ -383,7 +377,7 @@ export default function MockTestPage() {
                 type="button"
                 onClick={() => setCurrentQ((p) => Math.max(0, p - 1))}
                 disabled={currentQ === 0}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center gap-2 rounded border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" /> Previous
               </button>
@@ -392,7 +386,7 @@ export default function MockTestPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentQ((p) => Math.min(total - 1, p + 1))}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[#1F3354] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#25406a] transition-colors"
+                  className="inline-flex items-center gap-2 rounded bg-[#1F3354] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#25406a] transition-colors"
                 >
                   Next <ChevronRight className="h-4 w-4" />
                 </button>
@@ -400,7 +394,7 @@ export default function MockTestPage() {
                 <button
                   type="button"
                   onClick={() => submitTest(false)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-700 shadow-sm transition-colors"
+                  className="inline-flex items-center gap-2 rounded bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 transition-colors"
                 >
                   <Send className="h-4 w-4" /> Submit Test
                 </button>
@@ -439,14 +433,14 @@ export default function MockTestPage() {
           <div className="mx-auto max-w-3xl px-4 space-y-5">
 
             {/* Result banner */}
-            <div className={`rounded-2xl overflow-hidden shadow-sm ${result.passed ? "bg-emerald-600" : "bg-[#1F3354]"}`}>
+            <div className={`rounded-xl overflow-hidden shadow-sm ${result.passed ? "bg-emerald-600" : "bg-[#1F3354]"}`}>
               <div className="px-8 py-7 flex flex-col sm:flex-row items-center justify-between gap-6 text-white">
                 <div>
-                  <p className="text-sm font-semibold opacity-75 mb-1">{test!.title}</p>
-                  <h2 className="text-3xl font-black">
+                  <p className="text-sm opacity-70 mb-1">{test!.title}</p>
+                  <h2 className="text-2xl font-semibold">
                     {result.passed ? "Well Done!" : "Keep Going!"}
                   </h2>
-                  <p className="mt-1 text-sm opacity-80">
+                  <p className="mt-1 text-sm opacity-75">
                     {result.passed
                       ? `You passed with ${pct}% — great work.`
                       : `You scored ${pct}%. You need ${result.passingMarks} to pass.`}
@@ -460,14 +454,13 @@ export default function MockTestPage() {
                       strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-black">{pct}%</span>
-                    <span className="text-[11px] opacity-75">{result.score}/{result.totalMarks}</span>
+                    <span className="text-2xl font-bold">{pct}%</span>
+                    <span className="text-[11px] opacity-70">{result.score}/{result.totalMarks}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 4-stat row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
                 { label: "Score", val: `${result.score}/${result.totalMarks}`, col: "text-slate-800" },
@@ -475,21 +468,20 @@ export default function MockTestPage() {
                 { label: "Wrong", val: result.attempted - result.correct, col: "text-red-600" },
                 { label: "Skipped", val: result.totalQuestions - result.attempted, col: "text-slate-500" },
               ].map((s) => (
-                <div key={s.label} className="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm">
-                  <p className={`text-2xl font-black ${s.col}`}>{s.val}</p>
+                <div key={s.label} className="rounded border border-slate-200 bg-white p-4 text-center shadow-sm">
+                  <p className={`text-2xl font-bold ${s.col}`}>{s.val}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
                 </div>
               ))}
             </div>
 
-            {/* Tab switcher */}
-            <div className="flex rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div className="flex rounded border border-slate-200 bg-white overflow-hidden shadow-sm">
               {(["summary", "review"] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"
                   onClick={() => setResultTab(tab)}
-                  className={`flex-1 py-3 text-sm font-semibold transition-colors ${
+                  className={`flex-1 py-3 text-sm font-medium transition-colors ${
                     resultTab === tab ? "bg-[#1F3354] text-white" : "text-slate-600 hover:bg-slate-50"
                   }`}
                 >
@@ -499,8 +491,8 @@ export default function MockTestPage() {
             </div>
 
             {resultTab === "summary" && (
-              <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-5">
-                <h3 className="text-sm font-bold text-slate-800">Performance Breakdown</h3>
+              <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-5">
+                <h3 className="text-sm font-medium text-slate-800">Performance Breakdown</h3>
                 {[
                   { label: "Your Score", value: result.score, max: result.totalMarks, color: result.passed ? "bg-emerald-500" : "bg-red-500" },
                   { label: "Passing Mark", value: result.passingMarks, max: result.totalMarks, color: "bg-amber-400" },
@@ -508,7 +500,7 @@ export default function MockTestPage() {
                   <div key={bar.label}>
                     <div className="flex justify-between text-xs text-slate-500 mb-1.5">
                       <span>{bar.label}</span>
-                      <span className="font-semibold text-slate-700">{bar.value}/{bar.max}</span>
+                      <span className="text-slate-700">{bar.value}/{bar.max}</span>
                     </div>
                     <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
                       <div className={`h-full rounded-full ${bar.color}`}
@@ -517,16 +509,16 @@ export default function MockTestPage() {
                   </div>
                 ))}
                 <div className="grid grid-cols-3 gap-3 pt-1">
-                  <div className="rounded-xl bg-emerald-50 p-4 text-center">
-                    <p className="text-2xl font-black text-emerald-600">{result.correct}</p>
+                  <div className="rounded bg-emerald-50 p-4 text-center">
+                    <p className="text-2xl font-bold text-emerald-600">{result.correct}</p>
                     <p className="text-xs text-emerald-700 mt-0.5">Correct</p>
                   </div>
-                  <div className="rounded-xl bg-red-50 p-4 text-center">
-                    <p className="text-2xl font-black text-red-600">{result.attempted - result.correct}</p>
+                  <div className="rounded bg-red-50 p-4 text-center">
+                    <p className="text-2xl font-bold text-red-600">{result.attempted - result.correct}</p>
                     <p className="text-xs text-red-700 mt-0.5">Wrong</p>
                   </div>
-                  <div className="rounded-xl bg-slate-100 p-4 text-center">
-                    <p className="text-2xl font-black text-slate-600">{result.totalQuestions - result.attempted}</p>
+                  <div className="rounded bg-slate-100 p-4 text-center">
+                    <p className="text-2xl font-bold text-slate-600">{result.totalQuestions - result.attempted}</p>
                     <p className="text-xs text-slate-500 mt-0.5">Skipped</p>
                   </div>
                 </div>
@@ -541,18 +533,17 @@ export default function MockTestPage() {
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3 pb-10">
               <button
                 type="button"
                 onClick={() => { setResult(null); setAnswers({}); setCurrentQ(0); setPhase("instructions"); }}
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl border-2 border-[#1F3354] px-5 py-3 text-sm font-bold text-[#1F3354] hover:bg-[#1F3354] hover:text-white transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 rounded border border-[#1F3354] px-5 py-3 text-sm text-[#1F3354] hover:bg-[#1F3354] hover:text-white transition-colors"
               >
                 <RotateCcw className="h-4 w-4" /> Retake Test
               </button>
               <Link
                 href="/mock-test"
-                className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 rounded bg-red-600 px-5 py-3 text-sm font-medium text-white hover:bg-red-700 transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" /> All Mock Tests
               </Link>
@@ -574,14 +565,14 @@ function ReviewCard({ item, index }: { item: BreakdownItem; index: number }) {
   const skipped = item.selectedOption === -1;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+    <div className="bg-white rounded border border-slate-200 overflow-hidden shadow-sm">
       {/* Status strip */}
-      <div className={`flex items-center justify-between px-5 py-2.5 text-xs font-semibold ${
+      <div className={`flex items-center justify-between px-5 py-2.5 text-xs ${
         skipped ? "bg-slate-50 text-slate-500 border-b border-slate-100"
           : item.isCorrect ? "bg-emerald-50 text-emerald-700 border-b border-emerald-100"
           : "bg-red-50 text-red-700 border-b border-red-100"
       }`}>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1.5 font-medium">
           {skipped ? <Circle className="h-3.5 w-3.5" />
             : item.isCorrect ? <CheckCircle2 className="h-3.5 w-3.5" />
             : <XCircle className="h-3.5 w-3.5" />}
@@ -589,21 +580,19 @@ function ReviewCard({ item, index }: { item: BreakdownItem; index: number }) {
         </span>
         <span>{item.marks} {item.marks === 1 ? "mark" : "marks"}</span>
       </div>
-
       <div className="px-5 py-5">
-        <p className="text-sm font-semibold leading-relaxed text-slate-800 mb-4">{item.questionText}</p>
-
+        <p className="text-sm leading-relaxed text-slate-800 mb-4">{item.questionText}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {item.options.map((opt, i) => {
             const correct = i === item.correctOption;
             const wrongPick = i === item.selectedOption && !correct;
             return (
-              <div key={i} className={`flex items-center gap-3 rounded-lg border px-3.5 py-2.5 text-xs ${
+              <div key={i} className={`flex items-center gap-3 rounded border px-3.5 py-2.5 text-xs ${
                 correct ? "border-emerald-200 bg-emerald-50 text-emerald-800"
                   : wrongPick ? "border-red-200 bg-red-50 text-red-800"
                   : "border-slate-100 bg-slate-50 text-slate-600"
               }`}>
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold ${
+                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-medium ${
                   correct ? "bg-emerald-500 text-white"
                     : wrongPick ? "bg-red-500 text-white"
                     : "bg-slate-200 text-slate-500"

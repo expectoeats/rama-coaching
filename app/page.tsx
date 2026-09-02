@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, Calendar, BookOpen, Bell, TrendingUp } from "lucide-react";
+import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, Calendar, BookOpen, Bell, X } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 
@@ -23,6 +23,7 @@ const GALLERY_IMAGES = [
 
 export default function HomePage() {
   const [courses, setCourses] = useState(FALLBACK_COURSES);
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
 
   useEffect(() => {
     fetch("/api/courses?limit=12", { cache: "no-store" })
@@ -41,9 +42,18 @@ export default function HomePage() {
       }).catch(() => {});
   }, []);
 
+  // Show announcement popup on first load
+  useEffect(() => {
+    const timer = setTimeout(() => setShowAnnouncement(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <SiteNav />
+
+      {/* Announcement Popup */}
+      <AnnouncementPopup open={showAnnouncement} onClose={() => setShowAnnouncement(false)} />
 
       {/* Hero Banner */}
       <section className="relative w-full overflow-hidden">
@@ -85,34 +95,34 @@ export default function HomePage() {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
-            <div className="bg-emerald-600 p-8 text-white text-center hover:bg-emerald-700 transition-colors">
+            <Link href="/contact" className="bg-emerald-600 p-8 text-white text-center hover:bg-emerald-700 transition-colors cursor-pointer">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <FileText className="w-7 h-7" />
               </div>
               <h3 className="text-lg font-medium">Apply Online</h3>
               <p className="text-sm mt-2 opacity-80">Easy admission process</p>
-            </div>
-            <div className="bg-blue-600 p-8 text-white text-center hover:bg-blue-700 transition-colors">
+            </Link>
+            <Link href="/contact" className="bg-blue-600 p-8 text-white text-center hover:bg-blue-700 transition-colors cursor-pointer">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <HeadphonesIcon className="w-7 h-7" />
               </div>
               <h3 className="text-lg font-medium">Superfast Support</h3>
               <p className="text-sm mt-2 opacity-80">24/7 assistance available</p>
-            </div>
-            <div className="bg-amber-500 p-8 text-white text-center hover:bg-amber-600 transition-colors">
+            </Link>
+            <Link href="/verification" className="bg-amber-500 p-8 text-white text-center hover:bg-amber-600 transition-colors cursor-pointer">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <Award className="w-7 h-7" />
               </div>
               <h3 className="text-lg font-medium">Certification</h3>
               <p className="text-sm mt-2 opacity-80">Government recognized</p>
-            </div>
-            <div className="bg-red-600 p-8 text-white text-center hover:bg-red-700 transition-colors">
+            </Link>
+            <Link href="/contact" className="bg-red-600 p-8 text-white text-center hover:bg-red-700 transition-colors cursor-pointer">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <CreditCard className="w-7 h-7" />
               </div>
               <h3 className="text-lg font-medium">Online Payment</h3>
               <p className="text-sm mt-2 opacity-80">Secure transactions</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -365,6 +375,137 @@ export default function HomePage() {
       </section>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+// ── Announcement Popup ────────────────────────────────────────────────────────
+
+const ANNOUNCEMENTS = [
+  {
+    icon: Bell,
+    color: "text-yellow-500",
+    title: "New Batches Starting Soon",
+    desc: "Admissions open for RSCIT, Tally Prime, and Digital Marketing courses. Limited seats available.",
+    href: "/contact",
+  },
+  {
+    icon: Award,
+    color: "text-green-500",
+    title: "Scholarship Available",
+    desc: "Merit-based scholarships up to 50% fee waiver for deserving students. Apply before deadline.",
+    href: "/contact",
+  },
+  {
+    icon: Calendar,
+    color: "text-blue-500",
+    title: "Weekend Classes",
+    desc: "Special weekend batches for working professionals. Saturday & Sunday classes now available.",
+    href: "/contact",
+  },
+  {
+    icon: BookOpen,
+    color: "text-purple-500",
+    title: "Free Demo Classes",
+    desc: "Attend a free demo class before enrollment. Call us to schedule your session today.",
+    href: "/contact",
+  },
+  {
+    icon: Award,
+    color: "text-red-500",
+    title: "Certificate Verification Online",
+    desc: "All Rama Coaching Center certificates can now be verified instantly on our website.",
+    href: "/verification",
+  },
+];
+
+function AnnouncementPopup({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Pause on hover
+  const pause = () => { if (trackRef.current) trackRef.current.style.animationPlayState = "paused"; };
+  const resume = () => { if (trackRef.current) trackRef.current.style.animationPlayState = "running"; };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 bg-black/50">
+      <div className="relative w-full max-w-md bg-white shadow-xl overflow-hidden"
+        style={{ borderRadius: 0 }}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-[#1F3354]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-white/15 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Public Announcements</p>
+              <p className="text-[11px] text-slate-300">Latest updates from Rama Coaching Center</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="w-7 h-7 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/15 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Scrolling area — fixed height, overflow hidden */}
+        <div
+          className="overflow-hidden bg-white"
+          style={{ height: "320px" }}
+          onMouseEnter={pause}
+          onMouseLeave={resume}
+        >
+          {/* CSS animation: scroll items bottom to top */}
+          <style>{`
+            @keyframes scrollUp {
+              0%   { transform: translateY(0); }
+              100% { transform: translateY(-50%); }
+            }
+            .scroll-track {
+              animation: scrollUp 14s linear infinite;
+            }
+          `}</style>
+
+          {/* Track — items duplicated for seamless loop */}
+          <div ref={trackRef} className="scroll-track">
+            {[...ANNOUNCEMENTS, ...ANNOUNCEMENTS].map((item, idx) => (
+              <Link
+                key={idx}
+                href={item.href}
+                onClick={onClose}
+                className="flex items-start gap-3.5 px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors group"
+              >
+                <item.icon className={`w-5 h-5 ${item.color} shrink-0 mt-0.5`} />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 group-hover:text-red-700 transition-colors">
+                    {item.title}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{item.desc}</p>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-red-500 shrink-0 mt-1 transition-colors" />
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-3.5 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+          <p className="text-xs text-gray-400">Click any item to learn more</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-xs text-red-600 hover:text-red-700 font-medium transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

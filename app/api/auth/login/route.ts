@@ -39,7 +39,7 @@ export async function POST(req: Request) {
 
     res.cookies.set("rama_token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
       path: "/",

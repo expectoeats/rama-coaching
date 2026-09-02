@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const res = NextResponse.json({ success: true, data: { id: String(student._id), name: student.fullName, email: student.email, rollNumber: student.rollNumber, role: "student" } });
     res.cookies.set("student_token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
       path: "/",

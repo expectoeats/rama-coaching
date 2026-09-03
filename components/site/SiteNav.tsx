@@ -15,6 +15,9 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
+// All nav hrefs — used for <link rel="prefetch"> in head
+const PREFETCH_LINKS = NAV_LINKS.map((l) => l.href).concat(["/login"]);
+
 export default function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -24,6 +27,11 @@ export default function SiteNav() {
 
   return (
     <>
+      {/* Prefetch all nav pages for instant navigation */}
+      {PREFETCH_LINKS.map((href) => (
+        <link key={href} rel="prefetch" href={href} />
+      ))}
+
       {/* Top Announcement Bar */}
       <div className="bg-[#b91c1c] text-white overflow-hidden">
         <div className="flex items-center justify-between px-6 py-2 text-xs">

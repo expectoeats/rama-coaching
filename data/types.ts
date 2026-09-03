@@ -109,7 +109,9 @@ export interface FranchiseApplication {
 export interface MockTestQuestion {
   id: string;
   questionText: string;
+  questionTextHi?: string; // Hindi translation of the question
   options: string[]; // exactly 4
+  optionsHi?: string[]; // Hindi translations of options (exactly 4)
   correctOption: number; // 0-indexed
   explanation: string;
   marks: number;

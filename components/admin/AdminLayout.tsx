@@ -23,11 +23,13 @@ import {
   ExternalLink,
   ChevronDown,
   ClipboardList,
+  Briefcase,
 } from "lucide-react";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/students", label: "Students", icon: Users },
+  { href: "/admin/staff", label: "Staff", icon: Briefcase },
   { href: "/admin/certificates", label: "Certificates", icon: Award },
   { href: "/admin/marksheets", label: "Marksheets", icon: FileText },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
@@ -44,6 +46,7 @@ const NAV = [
 const TITLES: Record<string, string> = {
   "/admin": "Dashboard",
   "/admin/students": "Students",
+  "/admin/staff": "Staff Management",
   "/admin/certificates": "Certificates",
   "/admin/marksheets": "Marksheets",
   "/admin/courses": "Courses",
@@ -55,6 +58,7 @@ const TITLES: Record<string, string> = {
   "/admin/messages": "Messages",
   "/admin/franchise": "Franchise Applications",
   "/admin/settings": "Settings",
+  "/admin/profile": "My Profile",
 };
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -70,7 +74,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/admin/login");
+    router.push("/login");
     router.refresh();
   }
 
@@ -197,14 +201,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-semibold text-white">
-              A
-            </span>
-            <div className="hidden sm:block">
-              <p className="text-sm font-medium text-slate-700">Admin</p>
-              <p className="text-xs text-slate-400">administrator</p>
-            </div>
-            <ChevronDown className="hidden h-4 w-4 text-slate-400 sm:block" />
+            <Link href="/admin/profile" className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100 transition-colors">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-semibold text-white">
+                A
+              </span>
+              <div className="hidden sm:block">
+                <p className="text-sm font-medium text-slate-700">Admin</p>
+                <p className="text-xs text-slate-400">administrator</p>
+              </div>
+              <ChevronDown className="hidden h-4 w-4 text-slate-400 sm:block" />
+            </Link>
           </div>
 
           <button

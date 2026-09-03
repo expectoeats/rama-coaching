@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Users, Award, BookOpen, Building2, Mail, Plus, FilePlus2, ArrowRight, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { certificateStatusVariant, franchiseStatusVariant, titleCase } from "@/lib/status";
-import type { LucideIcon } from "lucide-react";
+import { DashboardSkeleton } from "@/components/ui/Skeleton";
 
 function StatCard({ icon: Icon, label, value, hint }: { icon: LucideIcon; label: string; value: number; hint: string }) {
   return (
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex items-center justify-center py-20"><div className="w-8 h-8 border-2 border-navy border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <DashboardSkeleton />;
   if (!data) return <div className="text-center py-10 text-slate-500">Failed to load dashboard. Try refreshing.</div>;
 
   return (

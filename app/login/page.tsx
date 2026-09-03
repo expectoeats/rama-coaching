@@ -1,47 +1,63 @@
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, Eye, EyeOff, LogIn, GraduationCap, ArrowRight } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, LogIn, GraduationCap, Briefcase, ShieldCheck } from "lucide-react";
+
+type Role = "student" | "staff" | "admin";
+
+const ROLES: { id: Role; label: string; icon: React.ElementType; desc: string }[] = [
+  { id: "student", label: "Student",  icon: GraduationCap, desc: "Student portal" },
+  { id: "staff",   label: "Staff",    icon: Briefcase,     desc: "Staff panel"    },
+  { id: "admin",   label: "Admin",    icon: ShieldCheck,   desc: "Admin panel"    },
+];
+
+const PLACEHOLDER: Record<Role, string> = {
+  student: "student@example.com",
+  staff:   "staff@ramacoaching.com",
+  admin:   "admin@ramacoaching.com",
+};
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [role, setRole]         = useState<Role>("student");
+  const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
-  const [show, setShow] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [show, setShow]         = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      // Try student login first
-      let res = await fetch("/api/auth/student/login", {
-        method: "POST",
+      const apiUrl    = role === "student" ? "/api/auth/student/login" : "/api/auth/login";
+      const redirectTo = role === "student" ? "/student" : role === "staff" ? "/staff" : "/admin";
+
+      const res  = await fetch(apiUrl, {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body:    JSON.stringify({ email, password }),
       });
-      let data = await res.json();
-      if (data.success) {
-        router.push("/student");
-        router.refresh();
+      const data = await res.json();
+
+      if (!data.success) { setError(data.error || "Invalid credentials"); return; }
+
+      if (role === "staff" && data.data?.role !== "staff") {
+        setError("This account is not a staff account.");
+        await fetch("/api/auth/logout", { method: "POST" });
         return;
       }
-      // Fallback to admin login
-      res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      data = await res.json();
-      if (data.success) {
-        router.push("/admin");
-        router.refresh();
+      if (role === "admin" && data.data?.role !== "admin") {
+        setError("This account is not an admin account.");
+        await fetch("/api/auth/logout", { method: "POST" });
         return;
       }
-      setError(data.error || "Invalid credentials. Password is set by admin.");
+
+      router.push(redirectTo);
+      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -50,95 +66,134 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f172a] relative overflow-hidden p-4">
       {/* Background */}
       <div className="absolute inset-0">
-        <img src="/login-bg.jpg" alt="Login background" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-slate-900/70 backdrop-blur-[2px]" />
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-deep/40 via-transparent to-black/30" />
+        <img src="/login-bg.jpg" alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-[#0f172a]/75" />
       </div>
 
-      {/* Top bar */}
-      <Link href="/" className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-white/95 backdrop-blur px-3 py-2 rounded-lg shadow-lg hover:bg-white transition">
-        <img src="/logo.jpeg" alt="Rama" className="w-8 h-8 rounded-md object-contain" />
-        <span className="text-sm font-bold text-slate-800 hidden sm:block">Rama Coaching</span>
-      </Link>
+      <div className="relative z-10 w-full max-w-3xl grid grid-cols-1 lg:grid-cols-2 overflow-hidden shadow-2xl">
 
-      <div className="relative z-10 w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 rounded-2xl overflow-hidden shadow-2xl bg-white">
-        {/* Left - Branding / Info */}
-        <div className="hidden lg:flex flex-col justify-between p-10 text-white relative overflow-hidden bg-navy-deep">
-          <img src="/login-bg.jpg" alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-br from-navy-deep via-navy to-slate-900/80" />
-          <div className="relative">
-            <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center mb-6">
-              <GraduationCap className="w-7 h-7 text-navy" />
+        {/* ── LEFT — Branding ───────────────────────────── */}
+        <div className="hidden lg:flex flex-col justify-between bg-[#1F3354] px-9 py-10">
+
+          {/* Logo + name */}
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-12 w-12 bg-white flex items-center justify-center shrink-0">
+                <img src="/logo.jpeg" alt="Rama" className="h-10 w-10 object-contain" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Rama Coaching Center</p>
+                <p className="text-xs text-slate-400">And Computer Education Center</p>
+              </div>
             </div>
-            <h1 className="text-3xl font-bold leading-tight">Welcome Back</h1>
-            <p className="text-white/80 mt-3 text-sm leading-relaxed">Sign in to access your student dashboard, certificates, courses and more at Rama Coaching Center.</p>
-            <ul className="mt-8 space-y-3 text-sm text-white/90">
-              <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-400" /> 5000+ Students Trusted</li>
-              <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Government Recognized Certificates</li>
-              <li className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Secure & Fast Verification</li>
+
+            <p className="text-slate-400 text-sm leading-relaxed mb-10">
+              Sign in to access your portal. Students, staff, and admins each have their own dedicated section.
+            </p>
+
+            {/* Feature list */}
+            <ul className="space-y-3">
+              {[
+                "Government Recognised Certificates",
+                "Instant Online Verification",
+                "Secure & Fast Student Portal",
+                "55+ Centres Across Uttar Pradesh",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-sm text-slate-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0 mt-1.5" />
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
-          <div className="relative text-xs text-white/60">
-            <p>© 2026 Rama Coaching Center, Fatehpur</p>
-            <p className="mt-1">And Computer Education Center</p>
-          </div>
+
+          {/* Footer */}
+          <p className="text-xs text-slate-600">© 2026 Rama Coaching Center, Fatehpur, UP</p>
         </div>
 
-        {/* Right - Form */}
-        <div className="p-8 sm:p-10 flex flex-col justify-center bg-white">
-          <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img src="/logo.jpeg" alt="Rama" className="w-10 h-10 rounded-lg object-contain border" />
-            <div>
-              <p className="text-sm font-bold text-slate-800">Rama Coaching Center</p>
-              <p className="text-xs text-slate-500">Student Portal</p>
+        {/* ── RIGHT — Form ──────────────────────────────── */}
+        <div className="bg-white flex flex-col justify-center px-7 py-9 sm:px-9">
+
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center gap-3 mb-7">
+            <img src="/logo.jpeg" alt="Rama" className="h-9 w-9 object-contain border border-slate-200" />
+            <p className="text-sm font-semibold text-slate-800">Rama Coaching Center</p>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-slate-800">Sign in</h2>
+            <p className="text-sm text-slate-400 mt-0.5">Choose your role and enter your credentials</p>
+          </div>
+
+          {/* ── Role tabs ── */}
+          <div className="mb-6">
+            <p className="text-xs text-slate-500 mb-2 uppercase tracking-wide">Sign in as</p>
+            <div className="grid grid-cols-3 border border-slate-200 divide-x divide-slate-200">
+              {ROLES.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => { setRole(id); setError(""); setEmail(""); }}
+                  className={`flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
+                    role === id
+                      ? "bg-[#1F3354] text-white"
+                      : "bg-white text-slate-500 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-800">Student Login</h2>
-            <p className="text-sm text-slate-500 mt-1">Enter your credentials to continue</p>
-          </div>
+          {/* Error */}
+          {error && (
+            <div className="mb-4 border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
-          {error ? (
-            <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
-          ) : null}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <label className="block text-sm text-slate-600 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="student@example.com"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-navy/20 focus:border-navy outline-none text-sm bg-white"
+                  placeholder={PLACEHOLDER[role]}
+                  className="w-full pl-9 pr-4 py-2.5 border border-slate-300 focus:border-[#1F3354] focus:ring-1 focus:ring-[#1F3354]/20 outline-none text-sm bg-white transition-colors"
                 />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-slate-700">Password</label>
-                <Link href="#" className="text-xs text-navy hover:underline">Forgot password?</Link>
-              </div>
+              <label className="block text-sm text-slate-600 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type={show ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-navy/20 focus:border-navy outline-none text-sm"
+                  className="w-full pl-9 pr-10 py-2.5 border border-slate-300 focus:border-[#1F3354] focus:ring-1 focus:ring-[#1F3354]/20 outline-none text-sm transition-colors"
                 />
-                <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <button
+                  type="button"
+                  onClick={() => setShow(!show)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  tabIndex={-1}
+                >
+                  {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
@@ -146,29 +201,30 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 bg-navy hover:bg-navy-deep text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-60 shadow-md"
+              className={`w-full flex items-center justify-center gap-2 py-2.5 text-sm text-white transition-colors mt-1 disabled:opacity-60 ${
+                role === "student" ? "bg-emerald-600 hover:bg-emerald-700" :
+                role === "staff"   ? "bg-[#1F3354] hover:bg-[#162640]"   :
+                                     "bg-red-700 hover:bg-red-800"
+              }`}
             >
-              {loading ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <LogIn className="w-4 h-4" />}
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? (
+                <><span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Signing in…</>
+              ) : (
+                <><LogIn className="h-4 w-4" /> Sign in as {ROLES.find(r => r.id === role)?.label}</>
+              )}
             </button>
           </form>
 
-          <div className="mt-6 text-center space-y-3">
-            <p className="text-sm text-slate-600">
-              Don&apos;t have an account? <Link href="#" className="font-semibold text-navy hover:underline">Register</Link>
+          {/* Footer */}
+          <div className="mt-6 pt-4 border-t border-slate-100 text-center text-xs text-slate-400 space-y-1">
+            <p>
+              By signing in, you agree to our{" "}
+              <Link href="/contact" className="text-slate-600 hover:underline">Terms of Use</Link>
             </p>
-            <div className="pt-3 border-t border-slate-100">
-              <Link href="/admin/login" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-navy transition">
-                Login as Admin <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <p className="text-xs text-slate-400">Admin? Click “Login as Admin” and you’ll be redirected to /admin after login.</p>
-          </div>
-
-          <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-3">
-            <p className="text-xs font-semibold text-slate-700 mb-1">Demo Student</p>
-            <p className="text-xs text-slate-600">Use any student email from DB, or admin:</p>
-            <p className="text-xs text-slate-600">admin@ramacoaching.com / Admin@123 (goes to /admin)</p>
+            <p>
+              Need help?{" "}
+              <Link href="/contact" className="font-medium text-[#1F3354] hover:underline">Contact Support</Link>
+            </p>
           </div>
         </div>
       </div>

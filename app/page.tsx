@@ -116,7 +116,7 @@ export default function HomePage() {
               <h3 className="text-lg font-medium">Certification</h3>
               <p className="text-sm mt-2 opacity-80">Government recognized</p>
             </Link>
-            <Link href="/contact" className="bg-red-600 p-8 text-white text-center hover:bg-red-700 transition-colors cursor-pointer">
+            <Link href="/payment" className="bg-red-600 p-8 text-white text-center hover:bg-red-700 transition-colors cursor-pointer">
               <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <CreditCard className="w-7 h-7" />
               </div>

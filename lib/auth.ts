@@ -9,7 +9,7 @@ const COOKIE_NAME = "rama_token";
 export interface JWTPayload {
   id: string;
   email: string;
-  role: string;
+  role: string;   // "admin" | "staff"
   name: string;
 }
 

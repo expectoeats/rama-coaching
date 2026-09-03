@@ -46,7 +46,9 @@ const emptyTestDraft: TestDraft = {
 
 const emptyQDraft: QuestionDraft = {
   questionText: "",
+  questionTextHi: "",
   options: ["", "", "", ""],
+  optionsHi: ["", "", "", ""],
   correctOption: 0,
   explanation: "",
   marks: 1,
@@ -622,7 +624,9 @@ function QuestionsTab({
     setEditingIdx(idx);
     setDraft({
       questionText: q.questionText,
+      questionTextHi: q.questionTextHi || "",
       options: [...q.options],
+      optionsHi: q.optionsHi ? [...q.optionsHi] : ["", "", "", ""],
       correctOption: q.correctOption,
       explanation: q.explanation,
       marks: q.marks,
@@ -646,7 +650,9 @@ function QuestionsTab({
     const newQ: MockTestQuestion = {
       id: editingIdx !== null ? questions[editingIdx].id : "",
       questionText: draft.questionText.trim(),
+      questionTextHi: draft.questionTextHi?.trim() || undefined,
       options: draft.options.map((o) => o.trim()),
+      optionsHi: draft.optionsHi?.every((o) => o.trim()) ? draft.optionsHi.map((o) => o.trim()) : undefined,
       correctOption: draft.correctOption,
       explanation: draft.explanation.trim(),
       marks: draft.marks,
@@ -774,12 +780,22 @@ function QuestionsTab({
       >
         <div className="space-y-5">
           {/* Question text */}
-          <Field label="Question" required error={errors.questionText}>
+          <Field label="Question (English)" required error={errors.questionText}>
             <TextArea
               rows={3}
               value={draft.questionText}
               onChange={(e) => setDraft({ ...draft, questionText: e.target.value })}
               placeholder="Type your question here..."
+            />
+          </Field>
+
+          {/* Question text Hindi */}
+          <Field label="Question (Hindi — हिंदी में प्रश्न)" error={errors.questionTextHi}>
+            <TextArea
+              rows={3}
+              value={draft.questionTextHi || ""}
+              onChange={(e) => setDraft({ ...draft, questionTextHi: e.target.value })}
+              placeholder="यहाँ प्रश्न हिंदी में लिखें..."
             />
           </Field>
 
@@ -789,41 +805,55 @@ function QuestionsTab({
               Answer Options <span className="text-red-500">*</span>
               <span className="ml-2 text-xs font-normal text-slate-400">(Select the correct answer)</span>
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {draft.options.map((opt, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  {/* Correct answer selector */}
-                  <button
-                    type="button"
-                    onClick={() => setDraft({ ...draft, correctOption: i })}
-                    className="shrink-0"
-                    title={`Mark option ${String.fromCharCode(65 + i)} as correct`}
-                  >
-                    {draft.correctOption === i ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <Circle className="h-5 w-5 text-slate-300 hover:text-green-400" />
-                    )}
-                  </button>
-                  <div
-                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                      draft.correctOption === i
-                        ? "bg-green-100 text-green-700"
-                        : "bg-slate-100 text-slate-500"
-                    }`}
-                  >
-                    {String.fromCharCode(65 + i)}
+                <div key={i} className="space-y-1.5">
+                  <div className="flex items-center gap-3">
+                    {/* Correct answer selector */}
+                    <button
+                      type="button"
+                      onClick={() => setDraft({ ...draft, correctOption: i })}
+                      className="shrink-0"
+                      title={`Mark option ${String.fromCharCode(65 + i)} as correct`}
+                    >
+                      {draft.correctOption === i ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-slate-300 hover:text-green-400" />
+                      )}
+                    </button>
+                    <div
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                        draft.correctOption === i
+                          ? "bg-green-100 text-green-700"
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    >
+                      {String.fromCharCode(65 + i)}
+                    </div>
+                    <div className="flex-1">
+                      <TextInput
+                        value={opt}
+                        onChange={(e) => {
+                          const opts = [...draft.options];
+                          opts[i] = e.target.value;
+                          setDraft({ ...draft, options: opts });
+                        }}
+                        placeholder={`Option ${String.fromCharCode(65 + i)} (English)`}
+                        error={errors[`option_${i}`]}
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1">
+                  {/* Hindi option input */}
+                  <div className="ml-[60px]">
                     <TextInput
-                      value={opt}
+                      value={(draft.optionsHi || [])[i] || ""}
                       onChange={(e) => {
-                        const opts = [...draft.options];
+                        const opts = [...(draft.optionsHi || ["", "", "", ""])];
                         opts[i] = e.target.value;
-                        setDraft({ ...draft, options: opts });
+                        setDraft({ ...draft, optionsHi: opts });
                       }}
-                      placeholder={`Option ${String.fromCharCode(65 + i)}`}
-                      error={errors[`option_${i}`]}
+                      placeholder={`Option ${String.fromCharCode(65 + i)} हिंदी में`}
                     />
                   </div>
                 </div>
@@ -831,7 +861,7 @@ function QuestionsTab({
             </div>
             <p className="mt-2 flex items-center gap-1 text-xs text-slate-400">
               <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-              Click the circle next to an option to mark it as the correct answer
+              Click the circle next to an option to mark it as the correct answer. Hindi options are optional but recommended for bilingual exam display.
             </p>
           </div>
 
@@ -897,6 +927,9 @@ function QuestionCard({
 
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-slate-800 leading-relaxed">{question.questionText}</p>
+          {question.questionTextHi && (
+            <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">{question.questionTextHi}</p>
+          )}
 
           <div className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {question.options.map((opt, i) => (

@@ -6,6 +6,7 @@ export interface IUser extends Document {
   passwordHash: string;
   role: "admin" | "staff";
   status: "active" | "inactive";
+  avatarUrl?: string;
   lastLoginAt?: Date;
   deletedAt?: Date;
 }
@@ -17,6 +18,7 @@ const UserSchema = new Schema<IUser>(
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ["admin", "staff"], default: "admin" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
+    avatarUrl: { type: String },
     lastLoginAt: { type: Date },
     deletedAt: { type: Date },
   },

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, Award, BookOpen, Building2, Mail, Plus, FilePlus2, ArrowRight, TrendingUp } from "lucide-react";
+import { Users, Award, BookOpen, Building2, Mail, Plus, FilePlus2, ArrowRight, TrendingUp, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { certificateStatusVariant, franchiseStatusVariant, titleCase } from "@/lib/status";
 import { DashboardSkeleton } from "@/components/ui/Skeleton";

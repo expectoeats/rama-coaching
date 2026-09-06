@@ -127,7 +127,7 @@ export default function CoursesPage() {
                       <div className="text-xl font-bold text-red-600">{course.price}</div>
                       <div className="text-[11px] text-gray-400">Course Fee</div>
                     </div>
-                    <Link href="/contact" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm flex items-center gap-1.5 transition-colors">
+                    <Link href={`/courses/${course.id}`} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm flex items-center gap-1.5 transition-colors">
                       Enroll Now <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

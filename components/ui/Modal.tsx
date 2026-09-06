@@ -63,7 +63,7 @@ export function Modal({
           </div>
         ) : null}
         {/* Body — scrollable */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
+        <div className="flex-1 overflow-y-auto px-5 py-4" data-modal-scroll>{children}</div>
         {/* Footer — fixed */}
         {footer ? (
           <div className="flex shrink-0 justify-end gap-2 border-t border-slate-200 px-5 py-3">

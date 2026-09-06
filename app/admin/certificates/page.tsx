@@ -36,6 +36,7 @@ import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Badge } from "@/components/ui/Badge";
 import { certificateStatusVariant, titleCase } from "@/lib/status";
+import { printCertificateDirectly } from "@/lib/printUtils";
 
 const PAGE_SIZE = 6;
 
@@ -612,7 +613,14 @@ export default function CertificatesPage() {
                     <span className="text-amber-600">Not yet sent to student</span>
                   )}
                 </span>
-                <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-2 rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const docName = `RCCACE_Certificate_${viewRecord.certificateNumber || "Student"}`;
+                    printCertificateDirectly(docName);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep shadow-sm transition-colors"
+                >
                   <Printer className="h-4 w-4" /> Print / Save as PDF
                 </button>
               </div>

@@ -1,3 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap');
+
+@font-face {
+  font-family: 'Old English Custom';
+  src: url('/fonts/old-english.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -25,6 +35,22 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* Snappy, ultra-responsive button & link interaction feedback */
+button,
+a,
+input[type="button"],
+input[type="submit"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active:not(:disabled),
+a:active,
+.btn:active:not(:disabled) {
+  transform: scale(0.975);
+  transition: transform 0.04s ease-out;
 }
 
 html,
@@ -591,6 +617,8 @@ body {
   text-align: justify;
   overflow: hidden;
   user-select: none;
+  /* Mangalam style — subtle, around 0.55 opacity */
+  opacity: 0.55;
 }
 
 .seal-wm {
@@ -598,11 +626,16 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 560px;
-  height: 560px;
-  opacity: 0.1;
+  width: 420px;
+  height: 420px;
+  /* Mangalam style — exactly their opacity level */
+  opacity: 0.08;
   z-index: 1;
   pointer-events: none;
+  background-image: url('/logo.jpeg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .seal-wm-svg {
@@ -647,9 +680,11 @@ body {
 
 .doc-arch text,
 .doc-arch-flow text {
-  font-family: "UnifrakturCook", "Old English Text MT", serif;
-  font-weight: 700;
-  fill: var(--doc-ink);
+  font-family: 'Old English Custom', 'Old English Text MT', 'UnifrakturMaguntia', 'Cloister Black', 'Engravers Old English', cursive, serif;
+  font-weight: normal;
+  font-style: normal;
+  fill: #000000;
+  letter-spacing: 0.5px;
 }
 
 .doc-recognised {
@@ -1238,90 +1273,197 @@ body {
 }
 
 /* ----------------------------------------------------------------
-   Print
+   Dedicated print page UI  (/print route)
+   Visible in browser, hidden when printing
+----------------------------------------------------------------- */
+.print-page-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+  font-family: Arial, sans-serif;
+  color: #555;
+}
+
+.print-page-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #ddd;
+  border-top-color: #1f3354;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.no-print-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 24px;
+  background: #f0f4f8;
+  border-bottom: 1px solid #d0d8e4;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.print-page-hint {
+  color: #2d6a2d;
+  font-weight: 600;
+}
+
+.print-page-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.print-page-btn {
+  background: #1f3354;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+.print-page-btn:hover {
+  background: #16233b;
+}
+
+.print-page-btn-sec {
+  background: #fff;
+  color: #555;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+}
+
+.print-page-btn-sec:hover {
+  background: #f5f5f5;
+}
+
+/* The A4 document sits here */
+.print-doc-root {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  background: #e8e8e8;
+  min-height: calc(100vh - 53px);
+}
+
+/* ----------------------------------------------------------------
+   Print — @media rules
+   Works both from /print page AND from any window.print() call
 ----------------------------------------------------------------- */
 @media print {
+  /* Exact A4 portrait, zero margin */
   @page {
     size: A4 portrait;
-    margin: 0 !important;
+    margin: 0mm !important;
   }
 
-  html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 100% !important;
-    background: #ffffff !important;
+  /* Force exact colors, watermarks, stamps, and backgrounds */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
-  /* Remove any default modal/container padding */
-  .certificate-print-wrapper {
-    margin: 0 !important;
-    padding: 0 !important;
-    top: 0 !important;
-  }
-
+  html,
   body {
-    background: #fff;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    background: #ffffff !important;
+    overflow: visible !important;
   }
 
-  .no-print {
+  /* Hide common layout / UI chrome */
+  nav,
+  aside,
+  button,
+  .app-header,
+  .app-footer,
+  .no-print,
+  .no-print-bar,
+  .preview-toolbar,
+  .print-page-toolbar {
     display: none !important;
   }
 
-  .app {
-    display: block;
+  /* Hide everything on the page by default */
+  body * {
+    visibility: hidden;
   }
 
-  .app-main {
-    max-width: none;
-    margin: 0;
-    padding: 0;
+  /* Reveal ONLY the document and its children */
+  .doc-shell,
+  .doc-shell * {
+    visibility: visible !important;
   }
 
-  .preview {
-    position: static;
-    border: none;
-    background: #fff;
-    padding: 0;
-    border-radius: 0;
+  /* Explicitly ensure certificate header and footer are always visible and flex */
+  .doc-flow-header,
+  .doc-flow-footer,
+  .doc-shell .doc-flow-header,
+  .doc-shell .doc-flow-footer {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
-  .preview-stage {
-    background: #fff;
-    padding: 0 !important;
-    margin: 0 !important;
-    min-height: 0;
-    display: block;
-  }
-
-  .doc-scale-wrap {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
+  /* The certificate document: full A4 page, no scroll, no borders */
   .doc-shell {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: 210mm !important;
+    max-height: 297mm !important;
     margin: 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    z-index: 99999999 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
   }
 
-  .doc-scale-wrap.print-excellence {
-    --cert-scale: 1 !important;
+  /* Unconstrain all container elements in print */
+  .doc-scale-wrap,
+  .certificate-print-wrapper,
+  .preview-stage,
+  .preview,
+  .print-doc-root {
+    transform: none !important;
     width: 210mm !important;
     height: 297mm !important;
-  }
-
-  .doc-scale-wrap.print-excellence .doc-shell {
-    width: 210mm !important;
-    height: 297mm !important;
-  }
-
-  .doc-scale-wrap.print-marksheet {
-    --cert-scale: 1 !important;
-    width: 210mm !important;
-    height: 297mm !important;
-  }
-
-  .doc-scale-wrap.print-marksheet .doc-shell {
-    width: 210mm !important;
-    height: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
   }
 }
+

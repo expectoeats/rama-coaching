@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { TopProgressBar } from "@/components/ui/TopProgressBar";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,7 +25,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body className="font-poppins antialiased">{children}</body>
+      <body className="font-poppins antialiased">
+        <Suspense fallback={null}>
+          <TopProgressBar />
+        </Suspense>
+        {children}
+      </body>
     </html>
   );
 }
+

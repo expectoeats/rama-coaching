@@ -16,20 +16,35 @@ if (!cached) {
 }
 
 export async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) return cached.conn;
+  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
 
   if (!process.env.MONGODB_URI) {
     throw new Error("MONGODB_URI is missing from .env");
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(process.env.MONGODB_URI).then((m) => {
+    const opts: mongoose.ConnectOptions = {
+      bufferCommands: false,
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
+      family: 4,
+    };
+
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((m) => {
       cached.conn = m;
       return m;
     });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
   return cached.conn;
 }
 

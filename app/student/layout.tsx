@@ -28,7 +28,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-20">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/student" className="flex items-center gap-3">
+          <Link href="/student" prefetch={true} className="flex items-center gap-3">
             <img src="/logo.jpeg" alt="logo" className="w-9 h-9 rounded-md object-contain border" />
             <div>
               <p className="text-sm font-bold text-slate-800">Student Portal</p>
@@ -36,7 +36,7 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
             </div>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/student" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-navy"><BookOpen className="w-4 h-4" /> Dashboard</Link>
+            <Link href="/student" prefetch={true} className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-navy"><BookOpen className="w-4 h-4" /> Dashboard</Link>
             <div className="flex items-center gap-2">
               {student?.photoUrl ? <img src={student.photoUrl} alt={student.fullName} className="w-8 h-8 rounded-full object-cover border" /> : <span className="w-8 h-8 rounded-full bg-navy text-white flex items-center justify-center text-xs">{student?.fullName?.split(" ").map((p:string)=>p[0]).slice(0,2).join("") || "S"}</span>}
               <span className="hidden sm:block text-sm font-medium text-slate-700">{student?.fullName}</span>

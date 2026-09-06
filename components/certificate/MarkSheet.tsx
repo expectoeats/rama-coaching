@@ -47,20 +47,26 @@ export function Marksheet({ data }: { data: CertificateData }) {
 
           <div className="doc-flow doc-flow-marks">
             <div className="doc-flow-top">
-              <header className="doc-flow-header doc-flow-header-marks">
+              <div className="doc-flow-header doc-flow-header-marks">
                 <div className="doc-header-center">
-                  {/* Arched institution name — increased font size for prominence */}
-                  <svg className="doc-arch-flow" viewBox="-30 -70 960 320" aria-hidden="true">
+                  {/* Arched institution name — Mangalam College style: Old English Blackletter */}
+                  <svg className="doc-arch-flow" viewBox="0 0 900 200" aria-hidden="true">
                     <defs>
-                      <path id="archPathMarks" d="M 20,250 A 470,250 0 0 1 880,250" fill="none" />
+                      <path id="archPathMarks" d="M 50,185 A 420,165 0 0 1 850,185" fill="none" />
                     </defs>
-                    <text style={{ fontSize: 130 }} fill="#000000">
+                    <text
+                      style={{
+                        fontSize: 45,
+                        fontFamily: '"Old English Custom", "Old English Text MT", "UnifrakturMaguntia", "Cloister Black", "Engravers Old English", cursive, serif',
+                        fontWeight: "normal",
+                        letterSpacing: "0.2px",
+                      }}
+                      fill="#000000"
+                    >
                       <textPath
                         href="#archPathMarks"
                         startOffset="50%"
                         textAnchor="middle"
-                        textLength={880}
-                        lengthAdjust="spacingAndGlyphs"
                       >
                         Rama Coaching Centre &amp; Computer Education
                       </textPath>
@@ -91,7 +97,7 @@ export function Marksheet({ data }: { data: CertificateData }) {
                     }}
                   />
                 </div>
-              </header>
+              </div>
 
               <div className="doc-title-block">
                 <div className="doc-msheet-flow">MARKSHEET</div>
@@ -175,14 +181,14 @@ export function Marksheet({ data }: { data: CertificateData }) {
 
             <InstitutionBadges />
 
-            <footer className="doc-flow-footer">
+            <div className="doc-flow-footer">
               <div className="doc-footer-left">
                 <div>Dated : {data.dated || "—"}</div>
                 <div>Place : {data.place || "—"}</div>
               </div>
               <div className="doc-footer-secretary">Secretary</div>
               <div className="doc-footer-controller">Controller Of Examination</div>
-            </footer>
+            </div>
           </div>
         </div>
       </div>

@@ -97,23 +97,48 @@ export type FranchiseStatus = "pending" | "contacted" | "approved" | "rejected";
 export interface FranchiseApplication {
   id: string;
   name: string;
+  ownerName?: string;
+  instituteName?: string;
   email: string;
   phone: string;
   city: string;
   state: string;
   message: string;
+  duration?: string;
+  startDate?: string;
+  endDate?: string;
+  documentUrl?: string;
+  documentName?: string;
   date: string;
   status: FranchiseStatus;
+  approvedAt?: string;
+  rejectionReason?: string;
+}
+
+export interface FranchiseCertificate {
+  id: string;
+  applicationId: string;
+  certificateNumber: string;
+  ownerName: string;
+  instituteName: string;
+  city: string;
+  state: string;
+  duration: string;
+  startDate: string;
+  endDate: string;
+  issueDate: string;
+  status: "issued" | "revoked";
 }
 
 export interface MockTestQuestion {
   id: string;
   questionText: string;
-  questionTextHi?: string; // Hindi translation of the question
-  options: string[]; // exactly 4
-  optionsHi?: string[]; // Hindi translations of options (exactly 4)
-  correctOption: number; // 0-indexed
+  questionTextHi?: string;   // Hindi translation of the question
+  options: string[];          // exactly 4
+  optionsHi?: string[];       // Hindi translations of options (exactly 4)
+  correctOption: number;      // 0-indexed
   explanation: string;
+  explanationHi?: string;     // Hindi translation of explanation
   marks: number;
 }
 
@@ -122,7 +147,9 @@ export interface MockTest {
   title: string;
   description: string;
   subject: string;
-  duration: number; // minutes
+  courseCategory: string;
+  isFree: boolean;
+  duration: number;
   totalMarks: number;
   passingMarks: number;
   questions: MockTestQuestion[];

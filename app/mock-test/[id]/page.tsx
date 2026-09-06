@@ -52,10 +52,13 @@ interface TestMeta {
 interface BreakdownItem {
   questionId: string;
   questionText: string;
+  questionTextHi?: string;
   options: string[];
+  optionsHi?: string[];
   selectedOption: number;
   correctOption: number;
   explanation: string;
+  explanationHi?: string;
   isCorrect: boolean;
   marks: number;
   marksEarned: number;
@@ -801,28 +804,39 @@ export default function MockTestPage() {
                   <span className="ml-auto text-xs text-slate-500 border border-slate-200 rounded px-2 py-1 bg-slate-50">{q.marks} Mark{q.marks !== 1 ? "s" : ""}</span>
                 </div>
 
-                {/* bilingual — show only available language panels */}
+                {/* bilingual — Hindi left, English right, synced selection */}
                 {(() => {
                   const hasHindi = !!(q.questionTextHi?.trim());
                   const hasEnglish = !!(q.questionText?.trim());
                   const bothAvailable = hasHindi && hasEnglish;
 
-                  const renderOptions = (opts: string[], prefix: string, bg: string) =>
+                  // Single handler — selecting from either panel updates same answer
+                  const selectOption = (i: number) => setAnswers({ ...answers, [q.id]: i });
+
+                  const renderOptionList = (opts: string[], accentBg: string) =>
                     opts.map((opt, i) => {
                       const selected = answers[q.id] === i;
                       return (
                         <label
-                          key={`${prefix}-${i}`}
-                          className={`flex items-center gap-2.5 rounded-md border px-3 py-2.5 cursor-pointer text-sm transition-colors ${selected ? `border-[#1F3354] ${bg} text-[#1F3354] shadow-sm` : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"}`}
+                          key={i}
+                          onClick={() => selectOption(i)}
+                          className={`flex items-center gap-2.5 rounded-md border px-3 py-2.5 cursor-pointer text-sm transition-colors select-none ${
+                            selected
+                              ? `border-[#1F3354] ${accentBg} text-[#1F3354] shadow-sm`
+                              : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
                         >
+                          {/* Hidden radio — single name keeps browser group in sync */}
                           <input
                             type="radio"
                             name={`q-${q.id}`}
+                            value={i}
                             checked={selected}
-                            onChange={() => setAnswers({ ...answers, [q.id]: i })}
-                            className="h-4 w-4 accent-[#1F3354] shrink-0"
+                            onChange={() => selectOption(i)}
+                            className="h-4 w-4 accent-[#1F3354] shrink-0 pointer-events-none"
+                            tabIndex={-1}
                           />
-                          <span className="text-xs font-medium">({String.fromCharCode(65 + i)})</span>
+                          <span className="text-xs font-medium shrink-0">({String.fromCharCode(65 + i)})</span>
                           <span className="flex-1 leading-snug">{opt}</span>
                           {selected && <CheckCircle2 className="h-3.5 w-3.5 text-[#1F3354] shrink-0" />}
                         </label>
@@ -831,23 +845,26 @@ export default function MockTestPage() {
 
                   return (
                     <div className={`flex-1 grid gap-6 lg:gap-8 ${bothAvailable ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"}`}>
-                      {/* Hindi panel — only if Hindi content exists */}
+                      {/* Hindi panel */}
                       {hasHindi && (
                         <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-4 sm:p-5">
                           <p className="text-[11px] font-semibold tracking-widest text-slate-500 uppercase mb-3">Hindi</p>
                           <h3 className="text-[14px] font-medium leading-7 text-slate-800">{q.questionTextHi}</h3>
                           <div className="mt-4 space-y-2">
-                            {renderOptions(q.optionsHi?.length ? q.optionsHi : q.options, "hi", "bg-white")}
+                            {renderOptionList(
+                              q.optionsHi?.length === 4 ? q.optionsHi : q.options,
+                              "bg-white"
+                            )}
                           </div>
                         </div>
                       )}
-                      {/* English panel — only if English content exists */}
+                      {/* English panel */}
                       {hasEnglish && (
                         <div className="rounded-lg border border-slate-100 bg-white p-4 sm:p-5">
                           <p className="text-[11px] font-semibold tracking-widest text-slate-500 uppercase mb-3">English</p>
                           <h3 className="text-[14px] font-medium leading-7 text-slate-800">{q.questionText}</h3>
                           <div className="mt-4 space-y-2">
-                            {renderOptions(q.options, "en", "bg-[#EEF2FF]")}
+                            {renderOptionList(q.options, "bg-[#EEF2FF]")}
                           </div>
                         </div>
                       )}
@@ -1181,44 +1198,89 @@ function LeaderboardBlock({ mockTestId }: { mockTestId: string }) {
 function ReviewCard({ item, index }: { item: BreakdownItem; index: number }) {
   const labels = ["A", "B", "C", "D"];
   const skipped = item.selectedOption === -1;
+  const hasHindi = !!(item.questionTextHi?.trim());
+
+  const OptionRow = ({
+    opts, hiOpts, prefix,
+  }: { opts: string[]; hiOpts?: string[]; prefix: string }) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {opts.map((opt, i) => {
+        const correct   = i === item.correctOption;
+        const wrongPick = i === item.selectedOption && !correct;
+        return (
+          <div key={`${prefix}-${i}`}
+            className={`flex flex-col gap-0.5 rounded border px-3.5 py-2.5 text-xs ${
+              correct    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : wrongPick ? "border-red-200 bg-red-50 text-red-800"
+              : "border-[#DED8C9]/50 bg-[#FBF9F4] text-[#5C574C]"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-medium ${
+                correct ? "bg-emerald-500 text-white" : wrongPick ? "bg-red-500 text-white" : "bg-[#DED8C9] text-[#5C574C]"
+              }`}>{labels[i]}</span>
+              <span className="flex-1 leading-snug">{opt}</span>
+              {correct    && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
+              {wrongPick  && <XCircle      className="h-3.5 w-3.5 shrink-0 text-red-500" />}
+            </div>
+            {/* Hindi sub-text */}
+            {hiOpts?.[i]?.trim() && (
+              <p className="ml-9 text-[10px] text-slate-400 leading-snug">{hiOpts[i]}</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 
   return (
     <div className="bg-white rounded border border-[#DED8C9] overflow-hidden shadow-sm">
-      <div className={`flex items-center justify-between px-5 py-2.5 text-xs ${skipped ? "bg-[#FBF9F4] text-[#5C574C] border-b border-[#DED8C9]" : item.isCorrect ? "bg-emerald-50 text-emerald-700 border-b border-emerald-100" : "bg-red-50 text-red-700 border-b border-red-100"}`}>
+      {/* Status strip */}
+      <div className={`flex items-center justify-between px-5 py-2.5 text-xs ${
+        skipped      ? "bg-[#FBF9F4] text-[#5C574C] border-b border-[#DED8C9]"
+        : item.isCorrect ? "bg-emerald-50 text-emerald-700 border-b border-emerald-100"
+        : "bg-red-50 text-red-700 border-b border-red-100"
+      }`}>
         <span className="flex items-center gap-1.5 font-medium">
           {skipped ? <Circle className="h-3.5 w-3.5" /> : item.isCorrect ? <CheckCircle2 className="h-3.5 w-3.5" /> : <XCircle className="h-3.5 w-3.5" />}
           Q{index + 1} — {skipped ? "Skipped" : item.isCorrect ? "Correct" : "Incorrect"}
         </span>
-        <span>
-          {item.marks} {item.marks === 1 ? "mark" : "marks"}
-        </span>
+        <span>{item.marks} {item.marks === 1 ? "mark" : "marks"}</span>
       </div>
+
       <div className="px-5 py-5">
-        <p className="text-sm leading-relaxed text-[#23211C] mb-4">{item.questionText}</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {item.options.map((opt, i) => {
-            const correct = i === item.correctOption;
-            const wrongPick = i === item.selectedOption && !correct;
-            return (
-              <div
-                key={i}
-                className={`flex items-center gap-3 rounded border px-3.5 py-2.5 text-xs ${correct ? "border-emerald-200 bg-emerald-50 text-emerald-800" : wrongPick ? "border-red-200 bg-red-50 text-red-800" : "border-[#DED8C9]/50 bg-[#FBF9F4] text-[#5C574C]"}`}
-              >
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded text-[10px] font-medium ${correct ? "bg-emerald-500 text-white" : wrongPick ? "bg-red-500 text-white" : "bg-[#DED8C9] text-[#5C574C]"}`}>{labels[i]}</span>
-                <span className="flex-1 leading-snug">{opt}</span>
-                {correct && <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />}
-                {wrongPick && <XCircle className="h-3.5 w-3.5 shrink-0 text-red-500" />}
-              </div>
-            );
-          })}
-        </div>
+        {/* Question — bilingual if available */}
+        {hasHindi ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+            {/* Hindi */}
+            <div className="rounded-lg border border-slate-100 bg-slate-50/60 px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">Hindi</p>
+              <p className="text-sm leading-relaxed text-[#23211C]">{item.questionTextHi}</p>
+            </div>
+            {/* English */}
+            <div className="rounded-lg border border-slate-100 bg-white px-4 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">English</p>
+              <p className="text-sm leading-relaxed text-[#23211C]">{item.questionText}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm leading-relaxed text-[#23211C] mb-4">{item.questionText}</p>
+        )}
+
+        {/* Options */}
+        <OptionRow opts={item.options} hiOpts={item.optionsHi} prefix="opt" />
+
+        {/* Explanation */}
         {item.explanation && (
           <div className="mt-4 flex items-start gap-2.5 rounded-lg border border-amber-100 bg-amber-50 px-4 py-3">
             <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-            <p className="text-xs leading-relaxed text-amber-800">
+            <div className="text-xs leading-relaxed text-amber-800">
               <span className="font-semibold">Explanation: </span>
               {item.explanation}
-            </p>
+              {item.explanationHi?.trim() && (
+                <p className="mt-1 text-amber-700 border-t border-amber-200 pt-1">{item.explanationHi}</p>
+              )}
+            </div>
           </div>
         )}
       </div>

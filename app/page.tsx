@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, Calendar, BookOpen, Bell, X } from "lucide-react";
+import { Check, GraduationCap, Trophy, Users, Building2, FileText, HeadphonesIcon, Award, CreditCard, ArrowRight, Calendar, BookOpen, Bell, X, ChevronLeft, ChevronRight, Volume2 } from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 
@@ -20,6 +20,132 @@ const GALLERY_IMAGES = [
   { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215QL4KNwPjkuI37PBPhoto.jpeg", alt: "Gallery Photo 3" },
   { src: "https://lakshaygroupedu.co.in/img/a215/CMS/215CDr4B1dSkA8DW6UPhoto.jpeg", alt: "Gallery Photo 4" },
 ];
+
+// Hero slider images from public folder
+const HERO_SLIDES = [
+  { src: "/hero-banner.png",   alt: "Rama Coaching Center" },
+  { src: "/hero-banner-1.png", alt: "Rama Coaching Center" },
+];
+
+// ── Hero Slider ───────────────────────────────────────────────────────────────
+function HeroSlider() {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const total = HERO_SLIDES.length;
+
+  const go = (idx: number) => setCurrent((idx + total) % total);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => setCurrent(p => (p + 1) % total), 4500);
+    return () => clearInterval(timerRef.current!);
+  }, []);
+
+  return (
+    <div className="relative w-full overflow-hidden select-none group">
+      {/* Slides */}
+      <div className="relative">
+        {HERO_SLIDES.map((slide, i) => (
+          <div
+            key={i}
+            className={`transition-opacity duration-700 ${i === current ? "opacity-100 relative" : "opacity-0 absolute inset-0"}`}
+            aria-hidden={i !== current}
+          >
+            <img
+              src={slide.src}
+              alt={slide.alt}
+              className="w-full h-[280px] sm:h-[380px] md:h-[480px] lg:h-[560px] object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Prev / Next */}
+      <button
+        type="button"
+        onClick={() => go(current - 1)}
+        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        aria-label="Previous"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        onClick={() => go(current + 1)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        aria-label="Next"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Dots */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {HERO_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => go(i)}
+            className={`h-2 rounded-full transition-all ${i === current ? "w-6 bg-white" : "w-2 bg-white/50"}`}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Notice Ticker ─────────────────────────────────────────────────────────────
+function NoticeTicker() {
+  const [notices, setNotices] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/notices", { cache: "no-store" })
+      .then(r => r.json())
+      .then(j => {
+        if (j.success && j.data.length > 0) {
+          setNotices(j.data.filter((n: any) => n.published).map((n: any) => n.title));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const fallback = [
+    "🎓 New Batches Starting Soon — Enroll Now!",
+    "📢 RSCIT, CCC, O-Level, Tally, ADCA Courses Available",
+    "🏆 100% Government Recognized Certificates",
+    "📞 Call us: 08299121689 | Fatehpur, UP 212601",
+    "🎁 Scholarship Available — Up to 50% Fee Waiver for Deserving Students",
+  ];
+
+  const items = notices.length > 0 ? notices : fallback;
+  // Duplicate items for seamless loop
+  const marqueeText = [...items, ...items].join("   •   ");
+
+  return (
+    <div className="bg-[#1F3354] text-white overflow-hidden border-y border-white/10">
+      <div className="flex items-center">
+        {/* Left label */}
+        <div className="flex items-center gap-2 bg-red-600 px-4 py-2.5 shrink-0 text-xs font-semibold whitespace-nowrap">
+          <Volume2 className="w-3.5 h-3.5" />
+          <span>NOTICE</span>
+        </div>
+        {/* Scrolling text */}
+        <div className="flex-1 overflow-hidden relative py-2.5">
+          <style>{`
+            @keyframes marquee {
+              0%   { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .marquee-track { animation: marquee 30s linear infinite; white-space: nowrap; display: inline-block; }
+            .marquee-track:hover { animation-play-state: paused; }
+          `}</style>
+          <div className="marquee-track text-sm text-slate-200 px-4">
+            {marqueeText}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   const [courses, setCourses] = useState(FALLBACK_COURSES);
@@ -55,14 +181,11 @@ export default function HomePage() {
       {/* Announcement Popup */}
       <AnnouncementPopup open={showAnnouncement} onClose={() => setShowAnnouncement(false)} />
 
-      {/* Hero Banner */}
-      <section className="relative w-full overflow-hidden">
-        <img
-          src="https://lakshaygroupedu.co.in/img/a215/CMS/215Z8YisHX6YPf1lWsSlider.jpeg"
-          alt="Rama Coaching Center Hero Banner"
-          className="w-full h-[280px] sm:h-[380px] md:h-[480px] lg:h-[560px] object-cover"
-        />
-      </section>
+      {/* ── Hero Image Slider ────────────────────────────────────────────── */}
+      <HeroSlider />
+
+      {/* ── Notice Ticker ────────────────────────────────────────────────── */}
+      <NoticeTicker />
 
       {/* Be Part of Us */}
       <section className="py-12 sm:py-16 bg-gray-50">

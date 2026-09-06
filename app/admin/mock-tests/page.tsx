@@ -2,20 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  ClipboardList,
-  Clock,
-  Target,
-  BookOpen,
-  HelpCircle,
-  ChevronLeft,
-  CheckCircle2,
-  Circle,
-  GripVertical,
-  AlertCircle,
+  Plus, Pencil, Trash2, Eye, ClipboardList, Clock, Target, BookOpen,
+  HelpCircle, ChevronLeft, CheckCircle2, Circle, GripVertical,
+  AlertCircle, Languages, Loader2, RotateCcw,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -33,6 +22,11 @@ import type { MockTest, MockTestQuestion } from "@/data/types";
 type TestDraft = Omit<MockTest, "id" | "questions">;
 type QuestionDraft = Omit<MockTestQuestion, "id">;
 
+const COURSE_CATEGORIES = [
+  "General", "O-Level", "CCC", "CCC+", "ADCA", "DCA",
+  "Tally", "Digital Marketing", "RSCIT", "Other",
+] as const;
+
 const emptyTestDraft: TestDraft = {
   title: "",
   description: "",
@@ -42,6 +36,8 @@ const emptyTestDraft: TestDraft = {
   passingMarks: 5,
   status: "active",
   attemptLimit: 10,
+  courseCategory: "General",
+  isFree: true,
 };
 
 const emptyQDraft: QuestionDraft = {
@@ -57,6 +53,19 @@ const emptyQDraft: QuestionDraft = {
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 type Tab = "tests" | "questions";
+
+// ─── Translation helper ───────────────────────────────────────────────────────
+async function translateTexts(texts: string[]): Promise<string[]> {
+  const res = await fetch("/api/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ texts }),
+  });
+  if (!res.ok) throw new Error("Translation API error");
+  const j = await res.json();
+  if (!j.success) throw new Error(j.error || "Translation failed");
+  return (j.results as Array<{ translated: string }>).map((r) => r.translated);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function MockTestsAdminPage() {
@@ -210,6 +219,8 @@ function TestsTab({ onManageQuestions }: { onManageQuestions: (t: MockTest) => v
       passingMarks: t.passingMarks,
       status: t.status,
       attemptLimit: t.attemptLimit,
+      courseCategory: t.courseCategory || "General",
+      isFree: t.isFree ?? true,
     });
     setErrors({});
     setModalOpen(true);
@@ -415,6 +426,26 @@ function TestsTab({ onManageQuestions }: { onManageQuestions: (t: MockTest) => v
               <option value="inactive">Inactive</option>
             </SelectField>
           </Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Course Category">
+              <SelectField
+                value={(draft as any).courseCategory || "General"}
+                onChange={(e) => setDraft({ ...draft, courseCategory: e.target.value } as any)}
+              >
+                {COURSE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </SelectField>
+            </Field>
+            <Field label="Access Type">
+              <SelectField
+                value={(draft as any).isFree !== false ? "free" : "paid"}
+                onChange={(e) => setDraft({ ...draft, isFree: e.target.value === "free" } as any)}
+              >
+                <option value="free">Free — Public trial</option>
+                <option value="paid">Enrolled students only</option>
+              </SelectField>
+            </Field>
+          </div>
         </div>
       </Modal>
 
@@ -585,7 +616,10 @@ function QuestionsTab({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteIdx, setDeleteIdx] = useState<number | null>(null);
 
-  // Sync questions from prop when test changes
+  // Translation state
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState("");
+
   useEffect(() => { setQuestions(test.questions); }, [test.id]);
 
   async function persistQuestions(updated: MockTestQuestion[]) {
@@ -616,6 +650,7 @@ function QuestionsTab({
     setEditingIdx(null);
     setDraft(emptyQDraft);
     setErrors({});
+    setTranslateError("");
     setModalOpen(true);
   }
 
@@ -632,6 +667,7 @@ function QuestionsTab({
       marks: q.marks,
     });
     setErrors({});
+    setTranslateError("");
     setModalOpen(true);
   }
 
@@ -642,28 +678,97 @@ function QuestionsTab({
       if (!opt.trim()) e[`option_${i}`] = `Option ${String.fromCharCode(65 + i)} is required`;
     });
     setErrors(e);
+    if (Object.keys(e).length > 0) {
+      // Scroll modal content to top so errors are visible
+      setTimeout(() => {
+        const el = document.querySelector("[data-modal-scroll]");
+        if (el) el.scrollTop = 0;
+      }, 50);
+    }
     return Object.keys(e).length === 0;
+  }
+
+  // ── Auto-translate English → Hindi ──────────────────────────────────────────
+  async function handleAutoTranslate() {
+    if (!draft.questionText.trim()) {
+      setTranslateError("Please enter the English question first.");
+      return;
+    }
+    setTranslating(true); setTranslateError("");
+    try {
+      const textsToTranslate = [
+        draft.questionText,
+        ...draft.options,
+        ...(draft.explanation.trim() ? [draft.explanation] : []),
+      ];
+      const translated = await translateTexts(textsToTranslate);
+      setDraft((prev) => ({
+        ...prev,
+        questionTextHi: translated[0] ?? "",
+        optionsHi: translated.slice(1, 5),
+      }));
+    } catch (e) {
+      setTranslateError(e instanceof Error ? e.message : "Translation failed. You can type Hindi manually.");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
+  function clearHindi() {
+    setDraft((prev) => ({ ...prev, questionTextHi: "", optionsHi: ["", "", "", ""] }));
+    setTranslateError("");
   }
 
   async function saveQuestion() {
     if (!validateQ()) return;
+
+    // Auto-translate if Hindi is empty — teacher doesn't need to do anything manually
+    let qHi   = draft.questionTextHi?.trim() || "";
+    let optsHi = (draft.optionsHi || []).map((o) => o?.trim() || "");
+    const hindiMissing = !qHi || optsHi.some((o) => !o);
+
+    if (hindiMissing) {
+      setTranslating(true);
+      setTranslateError("");
+      try {
+        const textsToTranslate = [
+          draft.questionText,
+          ...draft.options,
+          ...(draft.explanation.trim() ? [draft.explanation] : []),
+        ];
+        const translated = await translateTexts(textsToTranslate);
+        qHi    = translated[0]?.trim() || "";
+        optsHi = translated.slice(1, 5).map((t) => t?.trim() || "");
+        // Update draft so the modal shows the translated text if it stays open
+        setDraft((prev) => ({
+          ...prev,
+          questionTextHi: qHi,
+          optionsHi: optsHi,
+        }));
+      } catch {
+        // Translation failed — continue with English only, don't block save
+        qHi    = "";
+        optsHi = ["", "", "", ""];
+      } finally {
+        setTranslating(false);
+      }
+    }
+
     const newQ: MockTestQuestion = {
       id: editingIdx !== null ? questions[editingIdx].id : "",
-      questionText: draft.questionText.trim(),
-      questionTextHi: draft.questionTextHi?.trim() || undefined,
-      options: draft.options.map((o) => o.trim()),
-      optionsHi: draft.optionsHi?.every((o) => o.trim()) ? draft.optionsHi.map((o) => o.trim()) : undefined,
+      questionText:   draft.questionText.trim(),
+      questionTextHi: qHi || undefined,
+      options:  draft.options.map((o) => o.trim()),
+      optionsHi: optsHi.every((o) => o) ? optsHi : undefined,
       correctOption: draft.correctOption,
-      explanation: draft.explanation.trim(),
+      explanation:   draft.explanation.trim(),
       marks: draft.marks,
     };
 
-    let updated: MockTestQuestion[];
-    if (editingIdx !== null) {
-      updated = questions.map((q, i) => (i === editingIdx ? newQ : q));
-    } else {
-      updated = [...questions, newQ];
-    }
+    const updated = editingIdx !== null
+      ? questions.map((q, i) => (i === editingIdx ? newQ : q))
+      : [...questions, newQ];
+
     setModalOpen(false);
     await persistQuestions(updated);
   }
@@ -771,97 +876,129 @@ function QuestionsTab({
             <button
               type="button"
               onClick={saveQuestion}
-              className="rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep"
+              disabled={translating}
+              className="rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2"
             >
-              {editingIdx !== null ? "Update Question" : "Add Question"}
+              {translating ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Translating & Saving…</>
+              ) : (
+                editingIdx !== null ? "Update Question" : "Add Question"
+              )}
             </button>
           </>
         }
       >
         <div className="space-y-5">
-          {/* Question text */}
+          {/* Error summary — shown at top so always visible */}
+          {Object.keys(errors).length > 0 && (
+            <div className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+              <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-red-700">Please fix the following:</p>
+                <ul className="mt-1 space-y-0.5 text-xs text-red-600 list-disc list-inside">
+                  {Object.values(errors).map((err, i) => (
+                    <li key={i}>{err}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+          {/* Question text English — only required field */}
           <Field label="Question (English)" required error={errors.questionText}>
             <TextArea
               rows={3}
               value={draft.questionText}
               onChange={(e) => setDraft({ ...draft, questionText: e.target.value })}
-              placeholder="Type your question here..."
+              placeholder="Type your question here in English..."
             />
           </Field>
 
-          {/* Question text Hindi */}
-          <Field label="Question (Hindi — हिंदी में प्रश्न)" error={errors.questionTextHi}>
-            <TextArea
-              rows={3}
-              value={draft.questionTextHi || ""}
-              onChange={(e) => setDraft({ ...draft, questionTextHi: e.target.value })}
-              placeholder="यहाँ प्रश्न हिंदी में लिखें..."
-            />
-          </Field>
+          {/* Auto-translate info bar */}
+          <div className="flex items-start gap-3 rounded-lg border border-violet-200 bg-violet-50 px-4 py-3">
+            <Languages className="h-4 w-4 text-violet-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-violet-800">Hindi Translation — Automatic</p>
+              <p className="text-xs text-violet-600 mt-0.5">
+                Hindi translation is generated <strong>automatically</strong> when you click Add/Update. You don't need to type Hindi manually.
+                Technical terms like CPU, HTML, RAM etc. are preserved as-is.
+              </p>
+              {/* Show generated Hindi preview if available */}
+              {draft.questionTextHi?.trim() && (
+                <p className="mt-2 text-xs text-violet-700 bg-white border border-violet-200 rounded px-3 py-2 leading-relaxed">
+                  {draft.questionTextHi}
+                </p>
+              )}
+              {translating && (
+                <p className="mt-2 text-xs text-violet-600 flex items-center gap-1.5 animate-pulse">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Generating Hindi translation…
+                </p>
+              )}
+              {translateError && (
+                <p className="mt-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                  ⚠ {translateError} — English-only question will be saved.
+                </p>
+              )}
+            </div>
+            {/* Manual translate / clear buttons */}
+            <div className="flex flex-col gap-1.5 shrink-0">
+              <button type="button" onClick={handleAutoTranslate}
+                disabled={translating || !draft.questionText.trim()}
+                className="inline-flex items-center gap-1 rounded bg-violet-600 px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                {translating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Languages className="h-3 w-3" />}
+                Preview
+              </button>
+              {draft.questionTextHi?.trim() && (
+                <button type="button" onClick={clearHindi}
+                  className="inline-flex items-center gap-1 rounded border border-violet-300 bg-white px-2.5 py-1.5 text-[11px] text-violet-700 hover:bg-violet-50">
+                  <RotateCcw className="h-3 w-3" /> Clear
+                </button>
+              )}
+            </div>
+          </div>
 
-          {/* Options */}
+          {/* Options — English only required */}
           <div>
             <p className="mb-2 text-sm font-medium text-slate-700">
               Answer Options <span className="text-red-500">*</span>
-              <span className="ml-2 text-xs font-normal text-slate-400">(Select the correct answer)</span>
+              <span className="ml-2 text-xs font-normal text-slate-400">(Select the correct answer — Hindi auto-fills on save)</span>
             </p>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {draft.options.map((opt, i) => (
-                <div key={i} className="space-y-1.5">
-                  <div className="flex items-center gap-3">
-                    {/* Correct answer selector */}
-                    <button
-                      type="button"
-                      onClick={() => setDraft({ ...draft, correctOption: i })}
-                      className="shrink-0"
-                      title={`Mark option ${String.fromCharCode(65 + i)} as correct`}
-                    >
-                      {draft.correctOption === i ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-slate-300 hover:text-green-400" />
-                      )}
-                    </button>
-                    <div
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                        draft.correctOption === i
-                          ? "bg-green-100 text-green-700"
-                          : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {String.fromCharCode(65 + i)}
-                    </div>
-                    <div className="flex-1">
-                      <TextInput
-                        value={opt}
-                        onChange={(e) => {
-                          const opts = [...draft.options];
-                          opts[i] = e.target.value;
-                          setDraft({ ...draft, options: opts });
-                        }}
-                        placeholder={`Option ${String.fromCharCode(65 + i)} (English)`}
-                        error={errors[`option_${i}`]}
-                      />
-                    </div>
+                <div key={i} className="flex items-center gap-3">
+                  <button type="button" onClick={() => setDraft({ ...draft, correctOption: i })} className="shrink-0">
+                    {draft.correctOption === i
+                      ? <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      : <Circle className="h-5 w-5 text-slate-300 hover:text-green-400" />}
+                  </button>
+                  <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                    draft.correctOption === i ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
+                  }`}>
+                    {String.fromCharCode(65 + i)}
                   </div>
-                  {/* Hindi option input */}
-                  <div className="ml-[60px]">
+                  <div className="flex-1">
                     <TextInput
-                      value={(draft.optionsHi || [])[i] || ""}
+                      value={opt}
                       onChange={(e) => {
-                        const opts = [...(draft.optionsHi || ["", "", "", ""])];
+                        const opts = [...draft.options];
                         opts[i] = e.target.value;
-                        setDraft({ ...draft, optionsHi: opts });
+                        setDraft({ ...draft, options: opts });
                       }}
-                      placeholder={`Option ${String.fromCharCode(65 + i)} हिंदी में`}
+                      placeholder={`Option ${String.fromCharCode(65 + i)} (English)`}
+                      error={errors[`option_${i}`]}
                     />
                   </div>
+                  {/* Hindi option preview — small, read-only */}
+                  {(draft.optionsHi || [])[i]?.trim() && (
+                    <span className="text-[11px] text-slate-400 max-w-[100px] truncate hidden sm:block">
+                      {(draft.optionsHi || [])[i]}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
             <p className="mt-2 flex items-center gap-1 text-xs text-slate-400">
               <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-              Click the circle next to an option to mark it as the correct answer. Hindi options are optional but recommended for bilingual exam display.
+              Click the circle to mark the correct answer.
             </p>
           </div>
 
@@ -898,61 +1035,59 @@ function QuestionsTab({
 }
 
 // ─── Question Card ─────────────────────────────────────────────────────────────
-
 function QuestionCard({
-  question,
-  index,
-  onEdit,
-  onDelete,
-  saving,
+  question, index, onEdit, onDelete, saving,
 }: {
-  question: MockTestQuestion;
-  index: number;
-  onEdit: () => void;
-  onDelete: () => void;
-  saving: boolean;
+  question: MockTestQuestion; index: number;
+  onEdit: () => void; onDelete: () => void; saving: boolean;
 }) {
-  const optionLabels = ["A", "B", "C", "D"];
+  const labels = ["A", "B", "C", "D"];
+  const hasHindi = !!(question.questionTextHi?.trim());
 
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-start gap-4 p-5">
-        {/* Drag handle placeholder + index */}
-        <div className="flex flex-col items-center gap-1">
+        {/* Index */}
+        <div className="flex flex-col items-center gap-1 shrink-0">
           <GripVertical className="h-4 w-4 text-slate-300" />
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">
             {index + 1}
           </div>
+          {hasHindi && (
+            <span title="Bilingual question">
+              <Languages className="h-3.5 w-3.5 text-violet-500" />
+            </span>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
+          {/* English question */}
           <p className="text-sm font-medium text-slate-800 leading-relaxed">{question.questionText}</p>
-          {question.questionTextHi && (
-            <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">{question.questionTextHi}</p>
+          {/* Hindi question preview */}
+          {hasHindi && (
+            <p className="mt-1 text-xs text-slate-500 leading-relaxed border-l-2 border-violet-300 pl-2">
+              {question.questionTextHi}
+            </p>
           )}
 
+          {/* Options */}
           <div className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {question.options.map((opt, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
-                  i === question.correctOption
-                    ? "border-green-200 bg-green-50 text-green-700"
-                    : "border-slate-100 bg-slate-50 text-slate-600"
-                }`}
-              >
-                <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
-                    i === question.correctOption
-                      ? "bg-green-500 text-white"
-                      : "bg-slate-200 text-slate-500"
-                  }`}
-                >
-                  {optionLabels[i]}
-                </span>
-                <span className="truncate">{opt}</span>
-                {i === question.correctOption && (
-                  <CheckCircle2 className="ml-auto h-3.5 w-3.5 shrink-0 text-green-500" />
+              <div key={i} className={`flex flex-col gap-0.5 rounded-lg border px-3 py-2 text-xs ${
+                i === question.correctOption
+                  ? "border-green-200 bg-green-50 text-green-700"
+                  : "border-slate-100 bg-slate-50 text-slate-600"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                    i === question.correctOption ? "bg-green-500 text-white" : "bg-slate-200 text-slate-500"
+                  }`}>{labels[i]}</span>
+                  <span className="truncate">{opt}</span>
+                  {i === question.correctOption && <CheckCircle2 className="ml-auto h-3.5 w-3.5 shrink-0 text-green-500" />}
+                </div>
+                {/* Hindi option preview */}
+                {question.optionsHi?.[i]?.trim() && (
+                  <p className="ml-7 text-[10px] text-slate-400 truncate">{question.optionsHi[i]}</p>
                 )}
               </div>
             ))}
@@ -966,27 +1101,23 @@ function QuestionCard({
           )}
         </div>
 
+        {/* Actions */}
         <div className="flex shrink-0 flex-col items-end gap-2">
           <span className="rounded-full bg-navy/10 px-2.5 py-0.5 text-xs font-semibold text-navy">
             {question.marks} {question.marks === 1 ? "mark" : "marks"}
           </span>
+          {hasHindi && (
+            <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-semibold text-violet-600">
+              हिंदी ✓
+            </span>
+          )}
           <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={onEdit}
-              disabled={saving}
-              className="rounded-md border border-slate-300 p-1.5 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
-              title="Edit question"
-            >
+            <button type="button" onClick={onEdit} disabled={saving}
+              className="rounded-md border border-slate-300 p-1.5 text-slate-600 hover:bg-slate-50 disabled:opacity-50" title="Edit">
               <Pencil className="h-3.5 w-3.5" />
             </button>
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={saving}
-              className="rounded-md border border-red-200 p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-50"
-              title="Delete question"
-            >
+            <button type="button" onClick={onDelete} disabled={saving}
+              className="rounded-md border border-red-200 p-1.5 text-red-600 hover:bg-red-50 disabled:opacity-50" title="Delete">
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>

@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ClipboardList,
   Briefcase,
+  NotebookText,
 } from "lucide-react";
 
 const NAV = [
@@ -34,6 +35,7 @@ const NAV = [
   { href: "/admin/marksheets", label: "Marksheets", icon: FileText },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
   { href: "/admin/mock-tests", label: "Mock Tests", icon: ClipboardList },
+  { href: "/admin/enotes", label: "E-Notes", icon: NotebookText },
   { href: "/admin/testimonials", label: "Testimonials", icon: Star },
   { href: "/admin/banners", label: "Banners", icon: ImageIcon },
   { href: "/admin/achievements", label: "Achievements", icon: Trophy },
@@ -51,6 +53,7 @@ const TITLES: Record<string, string> = {
   "/admin/marksheets": "Marksheets",
   "/admin/courses": "Courses",
   "/admin/mock-tests": "Mock Tests",
+  "/admin/enotes": "E-Notes",
   "/admin/testimonials": "Testimonials",
   "/admin/banners": "Banners",
   "/admin/achievements": "Achievements",
@@ -121,6 +124,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={true}
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                   active ? "bg-white/10 text-white" : "text-slate-300 hover:bg-white/5 hover:text-white"
@@ -136,6 +140,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="border-t border-white/10 p-3">
           <Link
             href="/"
+            prefetch={true}
             className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/5 hover:text-white"
           >
             <ExternalLink className="h-4 w-4" />

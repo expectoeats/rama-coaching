@@ -1,49 +1,245 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
-import { Building2, Award, Users, TrendingUp, Check, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import {
+  Building2, Award, Users, TrendingUp, Check, Phone, Mail, MapPin,
+  ArrowRight, Upload, X, FileText, Calendar, Clock,
+} from "lucide-react";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 
-function FranchiseForm() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", state: "", message: "" });
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+// ─── Upload helper (base64 approach — no storage service needed) ──────────────
+async function encodeFileAsDataURL(file: File): Promise<{ url: string; name: string }> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve({ url: reader.result as string, name: file.name });
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
-  const handle = async (e: React.FormEvent) => {
+// ─── Franchise Application Form ───────────────────────────────────────────────
+function FranchiseForm() {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [form, setForm] = useState({
+    name:          "",
+    ownerName:     "",
+    instituteName: "",
+    email:         "",
+    phone:         "",
+    city:          "",
+    state:         "",
+    duration:      "",
+    startDate:     "",
+    endDate:       "",
+    message:       "",
+  });
+  const [docFile,    setDocFile]    = useState<File | null>(null);
+  const [uploading,  setUploading]  = useState(false);
+  const [loading,    setLoading]    = useState(false);
+  const [done,       setDone]       = useState(false);
+  const [errors,     setErrors]     = useState<Record<string, string>>({});
+
+  const inp = "w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none";
+
+  function set(k: string, v: string) { setForm(p => ({ ...p, [k]: v })); }
+
+  function validate() {
+    const e: Record<string, string> = {};
+    if (!form.name.trim())          e.name          = "Applicant name is required";
+    if (!form.ownerName.trim())     e.ownerName     = "Owner name is required";
+    if (!form.instituteName.trim()) e.instituteName = "Institute name is required";
+    if (!form.email.trim())         e.email         = "Email is required";
+    if (!form.phone.trim())         e.phone         = "Phone is required";
+    if (!form.city.trim())          e.city          = "City is required";
+    if (!form.state.trim())         e.state         = "State is required";
+    if (!form.duration.trim())      e.duration      = "Duration is required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }
+
+  async function handle(e: React.FormEvent) {
     e.preventDefault();
+    if (!validate()) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/franchise", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-      const j = await res.json();
-      if (j.success) { setDone(true); setForm({ name: "", email: "", phone: "", city: "", state: "", message: "" }); setTimeout(() => setDone(false), 4000); }
-      else alert(j.error || "Failed");
-    } catch { alert("Network error"); } finally { setLoading(false); }
-  };
+      let documentUrl  = "";
+      let documentName = "";
 
-  const inputClass = "w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none";
+      // Encode document as base64 if provided
+      if (docFile) {
+        setUploading(true);
+        const encoded = await encodeFileAsDataURL(docFile);
+        documentUrl  = encoded.url;
+        documentName = encoded.name;
+        setUploading(false);
+      }
+
+      const res = await fetch("/api/franchise", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, documentUrl, documentName }),
+      });
+      const j = await res.json();
+      if (j.success) {
+        setDone(true);
+        setForm({ name:"", ownerName:"", instituteName:"", email:"", phone:"", city:"", state:"", duration:"", startDate:"", endDate:"", message:"" });
+        setDocFile(null);
+        setTimeout(() => setDone(false), 6000);
+      } else {
+        alert(j.error || "Submission failed");
+      }
+    } catch { alert("Network error. Please try again."); }
+    finally { setLoading(false); setUploading(false); }
+  }
+
+  const Err = ({ field }: { field: string }) =>
+    errors[field] ? <p className="text-xs text-red-600 mt-1">{errors[field]}</p> : null;
 
   return (
-    <form onSubmit={handle} className="space-y-4">
+    <form onSubmit={handle} className="space-y-5">
       {done && (
-        <div className="bg-green-50 border border-green-200 rounded px-4 py-3 flex items-center gap-2 text-sm text-green-800">
-          <Check className="w-4 h-4 shrink-0" /> Application submitted. We will contact you soon.
+        <div className="bg-green-50 border border-green-200 rounded px-4 py-3 flex items-start gap-2 text-sm text-green-800">
+          <Check className="w-4 h-4 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium">Application submitted successfully!</p>
+            <p className="text-xs text-green-700 mt-0.5">We will review your proposal and contact you within 2–3 business days.</p>
+          </div>
         </div>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input required placeholder="Full Name *" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inputClass} />
-        <input required type="email" placeholder="Email *" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputClass} />
+
+      {/* Section: Applicant */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Applicant Details</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <input placeholder="Your Full Name *" value={form.name} onChange={e => set("name", e.target.value)} className={inp} />
+            <Err field="name" />
+          </div>
+          <div>
+            <input placeholder="Owner Name *" value={form.ownerName} onChange={e => set("ownerName", e.target.value)} className={inp} />
+            <Err field="ownerName" />
+          </div>
+          <div>
+            <input type="email" placeholder="Email Address *" value={form.email} onChange={e => set("email", e.target.value)} className={inp} />
+            <Err field="email" />
+          </div>
+          <div>
+            <input placeholder="Phone Number *" value={form.phone} onChange={e => set("phone", e.target.value)} className={inp} />
+            <Err field="phone" />
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input required placeholder="Phone *" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputClass} />
-        <input required placeholder="City *" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} className={inputClass} />
+
+      {/* Section: Institute */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Institute Information</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="md:col-span-2">
+            <input placeholder="Institute / Center Name *" value={form.instituteName} onChange={e => set("instituteName", e.target.value)} className={inp} />
+            <Err field="instituteName" />
+          </div>
+          <div>
+            <input placeholder="City *" value={form.city} onChange={e => set("city", e.target.value)} className={inp} />
+            <Err field="city" />
+          </div>
+          <div>
+            <input placeholder="State *" value={form.state} onChange={e => set("state", e.target.value)} className={inp} />
+            <Err field="state" />
+          </div>
+        </div>
       </div>
-      <input required placeholder="State *" value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} className={inputClass} />
-      <textarea required placeholder="Tell us about yourself & location..." rows={4} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} className={inputClass} />
-      <button disabled={loading} type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded transition-colors text-sm disabled:opacity-50">
-        {loading ? "Submitting…" : "Submit Application"}
+
+      {/* Section: Franchise Period */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Franchise Period</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <select value={form.duration} onChange={e => set("duration", e.target.value)} className={inp}>
+              <option value="">Select Duration *</option>
+              <option value="1 Year">1 Year</option>
+              <option value="2 Years">2 Years</option>
+              <option value="3 Years">3 Years</option>
+              <option value="5 Years">5 Years</option>
+            </select>
+            <Err field="duration" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Calendar className="w-3 h-3" /> Start Date
+            </label>
+            <input type="date" value={form.startDate} onChange={e => set("startDate", e.target.value)} className={inp} />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Calendar className="w-3 h-3" /> End Date
+            </label>
+            <input type="date" value={form.endDate} onChange={e => set("endDate", e.target.value)} className={inp} />
+          </div>
+        </div>
+      </div>
+
+      {/* Section: Documents */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Documents</p>
+        <div
+          className={`relative border-2 border-dashed rounded-lg px-4 py-5 text-center cursor-pointer transition-colors ${
+            docFile ? "border-green-400 bg-green-50" : "border-gray-300 hover:border-red-400 hover:bg-red-50/30"
+          }`}
+          onClick={() => fileRef.current?.click()}
+        >
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            className="hidden"
+            onChange={e => setDocFile(e.target.files?.[0] || null)}
+          />
+          {docFile ? (
+            <div className="flex items-center justify-center gap-3">
+              <FileText className="w-5 h-5 text-green-600 shrink-0" />
+              <span className="text-sm font-medium text-green-800 truncate max-w-xs">{docFile.name}</span>
+              <button type="button" onClick={e => { e.stopPropagation(); setDocFile(null); }} className="ml-1 text-red-500 hover:text-red-700">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-1.5">
+              <Upload className="w-6 h-6 text-gray-400" />
+              <p className="text-sm text-gray-600">Click to upload document</p>
+              <p className="text-xs text-gray-400">PDF, JPG, PNG, DOC (max 5 MB)</p>
+            </div>
+          )}
+        </div>
+        <p className="text-xs text-gray-500 mt-1.5">Upload: ID proof, address proof, or any supporting document</p>
+      </div>
+
+      {/* Message */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Additional Message</p>
+        <textarea
+          rows={4}
+          placeholder="Tell us about yourself, your experience, and why you want to open this center..."
+          value={form.message}
+          onChange={e => set("message", e.target.value)}
+          className={inp}
+        />
+      </div>
+
+      <button
+        disabled={loading || uploading}
+        type="submit"
+        className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded transition-colors text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+      >
+        {uploading ? "Uploading document…" : loading ? "Submitting…" : (
+          <><ArrowRight className="w-4 h-4" /> Submit Franchise Application</>
+        )}
       </button>
+
+      <p className="text-center text-xs text-gray-400">
+        After submission, our team will review and contact you within 2–3 business days.
+      </p>
     </form>
   );
 }

@@ -25,21 +25,24 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
     let score = 0;
     const breakdown = (doc as any).questions.map((q: any) => {
-      const qid = String(q._id);
+      const qid      = String(q._id);
       const selected = answers[qid] ?? -1; // -1 = skipped
-      const correct = q.correctOption;
+      const correct  = q.correctOption;
       const isCorrect = selected === correct;
       if (isCorrect) score += q.marks;
       return {
-        questionId: qid,
-        questionText: q.questionText,
-        options: q.options,
+        questionId:     qid,
+        questionText:   q.questionText   ?? "",
+        questionTextHi: q.questionTextHi ?? "",
+        options:        q.options        ?? [],
+        optionsHi:      q.optionsHi      ?? [],
         selectedOption: selected,
-        correctOption: correct,
-        explanation: q.explanation ?? "",
+        correctOption:  correct,
+        explanation:    q.explanation    ?? "",
+        explanationHi:  q.explanationHi  ?? "",
         isCorrect,
-        marks: q.marks,
-        marksEarned: isCorrect ? q.marks : 0,
+        marks:          q.marks,
+        marksEarned:    isCorrect ? q.marks : 0,
       };
     });
 

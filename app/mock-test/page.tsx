@@ -82,8 +82,9 @@ export default function MockTestListPage() {
       <section id="tests" className="bg-white pt-10 pb-0">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mb-6">
-            <p className="text-xs font-semibold uppercase tracking-widest text-red-600 mb-1">Course-wise Practice</p>
-            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">Mock Tests & Study Notes</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-red-600 mb-1">Study Material</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">Mock Tests</h2>
+            <p className="text-sm text-slate-500 mt-1">Practice tests by course category — free, no login required</p>
           </div>
 
           {/* Tab bar */}
@@ -135,18 +136,18 @@ export default function MockTestListPage() {
                 </div>
               )}
 
-              {/* Link to E-Notes */}
+              {/* Link to E-Notes / Study Material */}
               <div className="mt-8 flex items-center justify-between rounded-xl border border-violet-100 bg-violet-50/60 px-5 py-4">
                 <div className="flex items-center gap-3">
                   <NotebookText className="h-5 w-5 text-violet-600 shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-slate-800">Looking for study notes?</p>
-                    <p className="text-xs text-slate-500">Browse E-Notes and PDFs by course category</p>
+                    <p className="text-sm font-medium text-slate-800">Looking for study notes & PDFs?</p>
+                    <p className="text-xs text-slate-500">Browse E-Notes under Study Material section</p>
                   </div>
                 </div>
                 <Link href="/e-notes"
                   className="shrink-0 text-xs font-medium text-violet-700 border border-violet-200 rounded px-3 py-1.5 hover:bg-violet-600 hover:text-white transition-colors">
-                  Go to E-Notes →
+                  Study Material →
                 </Link>
               </div>
             </>

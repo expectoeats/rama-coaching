@@ -14,7 +14,8 @@ type Tab = (typeof TABS)[number];
 
 interface ENote {
   id: string; title: string; description: string;
-  courseCategory: string; accessType: string; fileUrl: string; content: string;
+  courseCategory: string; accessType: string;
+  imageUrl: string; fileUrl: string; content: string;
 }
 
 export default function ENotesPage() {
@@ -69,7 +70,7 @@ export default function ENotesPage() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-slate-300 mb-4">
-                <NotebookText className="h-3.5 w-3.5" /> Study Resources
+                <NotebookText className="h-3.5 w-3.5" /> Study Material
               </div>
               <h1 className="text-3xl lg:text-4xl font-bold leading-tight">
                 E-Notes & Study Material
@@ -224,8 +225,17 @@ function NoteCard({ note }: { note: ENote }) {
 
   return (
     <div className={`flex flex-col rounded-xl border overflow-hidden bg-white hover:shadow-md transition-shadow ${isFree ? "border-slate-200" : "border-violet-100"}`}>
-      {/* Top accent */}
-      <div className={`h-1 ${isFree ? "bg-emerald-500" : "bg-violet-500"}`} />
+      {/* Cover image or top accent */}
+      {note.imageUrl?.trim() ? (
+        <div className="h-36 w-full overflow-hidden bg-slate-100">
+          <img src={note.imageUrl} alt={note.title}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).parentElement!.style.display = "none"; }}
+          />
+        </div>
+      ) : (
+        <div className={`h-1 ${isFree ? "bg-emerald-500" : "bg-violet-500"}`} />
+      )}
 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-2 mb-2">

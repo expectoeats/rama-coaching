@@ -12,18 +12,18 @@ import {
 // ── Dropdown config ───────────────────────────────────────────────────────────
 const DROPDOWN_ITEMS = [
   {
-    label: "Study",
+    label: "Study Material",
     items: [
-      { href: "/mock-test", icon: ClipboardList, label: "Free Mock Tests",    desc: "Practice tests by course category" },
-      { href: "/e-notes",   icon: NotebookText,  label: "E-Notes",            desc: "Study material & PDFs" },
-      { href: "/courses",   icon: BookOpen,      label: "Courses",            desc: "View all courses & fees" },
+      { href: "/mock-test", icon: ClipboardList, label: "Mock Tests",       desc: "Free practice tests by course" },
+      { href: "/e-notes",   icon: NotebookText,  label: "E-Notes",          desc: "Study notes & PDFs" },
+      { href: "/courses",   icon: BookOpen,      label: "Courses",          desc: "View all courses & fees" },
     ],
   },
   {
     label: "Student",
     items: [
-      { href: "/login",        icon: GraduationCap, label: "Student Login",   desc: "Access your dashboard" },
-      { href: "/verification", icon: ShieldCheck,   label: "Verification",   desc: "Verify certificates online" },
+      { href: "/login",        icon: GraduationCap, label: "Student Login",  desc: "Access your dashboard" },
+      { href: "/verification", icon: ShieldCheck,   label: "Verification",  desc: "Verify certificates online" },
     ],
   },
 ];

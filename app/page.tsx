@@ -160,7 +160,7 @@ export default function HomePage() {
             id: c.id || i,
             title: c.name,
             desc: c.description,
-            img: FALLBACK_COURSES[i % FALLBACK_COURSES.length].img,
+            img: c.imageUrl?.trim() || FALLBACK_COURSES[i % FALLBACK_COURSES.length].img,
             fees: c.fees,
             duration: c.duration,
           })));

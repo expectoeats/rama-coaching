@@ -7,10 +7,11 @@ export interface IENote extends Document {
   title: string;
   description: string;
   courseCategory: CourseCategory;
-  accessType: ENoteAccessType;   // "free" = visible to all; "enrolled" = logged-in students only
-  fileUrl?: string;              // PDF / external link
-  content?: string;              // inline text content (optional)
-  order: number;                 // display order within category
+  accessType: ENoteAccessType;
+  imageUrl?: string;
+  fileUrl?: string;
+  content?: string;
+  order: number;
   status: "active" | "inactive";
   deletedAt?: Date;
 }
@@ -21,6 +22,7 @@ const ENoteSchema = new Schema<IENote>(
     description:    { type: String, required: true },
     courseCategory: { type: String, enum: COURSE_CATEGORIES, required: true },
     accessType:     { type: String, enum: ["free", "enrolled"], default: "enrolled" },
+    imageUrl:       { type: String, default: "" },
     fileUrl:        { type: String, default: "" },
     content:        { type: String, default: "" },
     order:          { type: Number, default: 0 },

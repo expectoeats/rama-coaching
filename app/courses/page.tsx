@@ -41,6 +41,7 @@ export default function CoursesPage() {
             level: c.category || "Beginner",
             price: c.fees,
             description: c.description,
+            imageUrl: c.imageUrl || "",
             features: ["Government Certificate", "Expert Faculty", "Practical Training", "Placement Support"],
           })));
         }
@@ -103,9 +104,13 @@ export default function CoursesPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {courses.map((course) => (
-              <div key={course.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100 flex flex-col">
-                <div className="w-full h-44 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white">
-                  {courseIcons[Number(String(course.id).slice(-1)) % 6 + 1] || <BookOpen className="w-14 h-14" />}
+              <div key={course.id} className="bg-white rounded-xl shadow-md shadow-gray-300/60 overflow-hidden hover:shadow-xl hover:shadow-gray-400/40 transition-all duration-200 border border-gray-200 flex flex-col">
+                <div className="w-full h-44 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white overflow-hidden">
+                  {course.imageUrl ? (
+                    <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover" />
+                  ) : (
+                    courseIcons[Number(String(course.id).slice(-1)) % 6 + 1] || <BookOpen className="w-14 h-14" />
+                  )}
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <h3 className="text-base font-semibold text-gray-800 mb-1.5">{course.title}</h3>

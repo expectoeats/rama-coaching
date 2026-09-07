@@ -20,6 +20,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Field, TextInput, TextArea, SelectField } from "@/components/ui/Field";
 import { EmptyState, Spinner } from "@/components/ui/EmptyState";
 import { courseStatusVariant } from "@/lib/status";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 
 // courses loaded from API
 import type { Course } from "@/data/types";
@@ -33,12 +34,14 @@ const emptyDraft: CourseDraft = {
   fees: "",
   category: "",
   accent: "#1F3354",
+  imageUrl: "",
   status: "active",
 };
 
 export default function CoursesAdminPage() {
   const [items, setItems] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -97,6 +100,7 @@ export default function CoursesAdminPage() {
       fees: c.fees,
       category: c.category,
       accent: c.accent,
+      imageUrl: c.imageUrl ?? "",
       status: c.status,
     });
     setErrors({});
@@ -115,6 +119,7 @@ export default function CoursesAdminPage() {
 
   async function save() {
     if (!validate()) return;
+    setSaving(true);
     try {
       const url = editingId ? `/api/courses/${editingId}` : "/api/courses";
       const method = editingId ? "PUT" : "POST";
@@ -124,6 +129,7 @@ export default function CoursesAdminPage() {
       await fetchList();
       setModalOpen(false);
     } catch { setErrors({ name: "Network error" }); }
+    finally { setSaving(false); }
   }
 
   function askDelete(id: string) {
@@ -275,9 +281,14 @@ export default function CoursesAdminPage() {
             <button
               type="button"
               onClick={save}
-              className="rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep"
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy-deep disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {editingId ? "Save Changes" : "Create Course"}
+              {saving ? (
+                <><span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />Saving…</>
+              ) : (
+                editingId ? "Save Changes" : "Create Course"
+              )}
             </button>
           </>
         }
@@ -346,6 +357,12 @@ export default function CoursesAdminPage() {
               </SelectField>
             </Field>
           </div>
+
+          <ImageUploadField
+            label="Course Image"
+            value={(draft as any).imageUrl ?? ""}
+            onChange={(url) => setDraft({ ...draft, imageUrl: url } as any)}
+          />
 
           <Field label="Accent Color">
             <div className="flex items-center gap-3">

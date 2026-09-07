@@ -37,6 +37,7 @@ export interface Course {
   fees: string;
   category: string;
   accent: string;
+  imageUrl?: string;
   status: "active" | "inactive";
 }
 

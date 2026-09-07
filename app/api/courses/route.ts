@@ -33,6 +33,7 @@ export async function GET(req: Request) {
       fees: c["fees"],
       category: c["category"],
       accent: c["accent"],
+      imageUrl: c["imageUrl"] ?? "",
       status: c["status"],
     }));
 
@@ -58,6 +59,7 @@ export async function POST(req: Request) {
       fees: fees.trim(),
       category: category?.trim() || "General",
       accent: accent || "#1F3354",
+      imageUrl: body.imageUrl?.trim() || "",
       status: status || "active",
     });
     return NextResponse.json({ success: true, data: doc }, { status: 201 });

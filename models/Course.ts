@@ -7,6 +7,7 @@ export interface ICourse extends Document {
   fees: string;
   category: string;
   accent: string;
+  imageUrl?: string;
   status: "active" | "inactive";
   deletedAt?: Date;
 }
@@ -19,6 +20,7 @@ const CourseSchema = new Schema<ICourse>(
     fees: { type: String, required: true },
     category: { type: String, required: true },
     accent: { type: String, default: "#1F3354" },
+    imageUrl: { type: String, default: "" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     deletedAt: { type: Date },
   },

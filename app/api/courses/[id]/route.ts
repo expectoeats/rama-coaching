@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     await connectDB();
     const body = await req.json();
     const update: any = {};
-    for (const k of ["name", "description", "duration", "fees", "category", "accent", "status"]) {
+    for (const k of ["name", "description", "duration", "fees", "category", "accent", "status", "imageUrl"]) {
       if (body[k] !== undefined) update[k] = typeof body[k] === "string" ? body[k].trim() : body[k];
     }
     const doc = await Course.findOneAndUpdate({ _id: params.id, deletedAt: { $exists: false } }, update, { new: true, runValidators: true });

@@ -8,18 +8,19 @@ import { Modal } from "@/components/ui/Modal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Field, TextInput, TextArea, SelectField } from "@/components/ui/Field";
 import { EmptyState, Spinner } from "@/components/ui/EmptyState";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 
 const CATEGORIES = ["All", "General", "O-Level", "CCC", "CCC+", "ADCA", "DCA", "Tally", "Digital Marketing", "RSCIT", "Other"];
 
 interface ENote {
   id: string; title: string; description: string;
   courseCategory: string; accessType: string;
-  fileUrl: string; content: string; order: number; status: string;
+  imageUrl: string; fileUrl: string; content: string; order: number; status: string;
 }
 
 const emptyDraft = {
   title: "", description: "", courseCategory: "General", accessType: "enrolled",
-  fileUrl: "", content: "", order: 0, status: "active",
+  imageUrl: "", fileUrl: "", content: "", order: 0, status: "active",
 };
 
 export default function ENotesAdminPage() {
@@ -62,7 +63,7 @@ export default function ENotesAdminPage() {
   function openEdit(n: ENote) {
     setEditingId(n.id);
     setDraft({ title: n.title, description: n.description, courseCategory: n.courseCategory,
-      accessType: n.accessType, fileUrl: n.fileUrl, content: n.content,
+      accessType: n.accessType, imageUrl: n.imageUrl ?? "", fileUrl: n.fileUrl, content: n.content,
       order: n.order, status: n.status });
     setErrors({}); setModalOpen(true);
   }
@@ -194,6 +195,11 @@ export default function ENotesAdminPage() {
               </SelectField>
             </Field>
           </div>
+          <ImageUploadField
+            label="Cover Image"
+            value={draft.imageUrl ?? ""}
+            onChange={(url) => setDraft({ ...draft, imageUrl: url })}
+          />
           <Field label="Resource URL (PDF / Google Drive / etc.)">
             <TextInput value={draft.fileUrl} onChange={e => setDraft({ ...draft, fileUrl: e.target.value })} placeholder="https://drive.google.com/..." />
           </Field>

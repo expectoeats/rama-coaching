@@ -10,6 +10,7 @@ function serialize(doc: any) {
     description:    doc.description,
     courseCategory: doc.courseCategory,
     accessType:     doc.accessType,
+    imageUrl:       doc.imageUrl ?? "",
     fileUrl:        doc.fileUrl  ?? "",
     content:        doc.content  ?? "",
     order:          doc.order    ?? 0,
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
     const doc = await ENote.create({
       title: title.trim(), description: description.trim(),
       courseCategory, accessType: accessType || "enrolled",
+      imageUrl: body.imageUrl?.trim() || "",
       fileUrl: fileUrl?.trim() || "", content: content?.trim() || "",
       order: Number(order) || 0, status: status || "active",
     });

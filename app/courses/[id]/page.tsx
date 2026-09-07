@@ -15,6 +15,7 @@ import type { MockTest } from "@/data/types";
 interface CourseDetail {
   id: string; name: string; description: string;
   duration: string; fees: string; category: string; accent: string;
+  imageUrl?: string;
 }
 
 interface ENote {
@@ -60,6 +61,7 @@ export default function CourseDetailPage() {
           id: cJ.data.id, name: cJ.data.name, description: cJ.data.description,
           duration: cJ.data.duration, fees: cJ.data.fees,
           category: cJ.data.category, accent: cJ.data.accent,
+          imageUrl: cJ.data.imageUrl || "",
         };
         setCourse(course);
 
@@ -109,54 +111,72 @@ export default function CourseDetailPage() {
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <section className="bg-[#1F3354] text-white">
         <div className="mx-auto max-w-6xl px-6 py-12 lg:py-16">
-          <Link href="/courses" className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white text-sm mb-6 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> All Courses
-          </Link>
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <span className="inline-block rounded bg-white/15 px-3 py-1 text-xs uppercase tracking-widest text-slate-300 mb-4">
-                {course.category}
-              </span>
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+
+            {/* ── Left — image only (full, clean) ── */}
+            <div className="flex flex-col gap-4">
+              <Link href="/courses" className="inline-flex items-center gap-1.5 text-slate-300 hover:text-white text-sm transition-colors w-fit">
+                <ArrowLeft className="h-4 w-4" /> All Courses
+              </Link>
               <h1 className="text-3xl lg:text-4xl font-bold leading-tight">{course.name}</h1>
-              <p className="mt-4 text-slate-300 leading-relaxed">{course.description}</p>
-              <div className="mt-6 flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2 bg-white/10 rounded px-3 py-2">
-                  <Clock className="h-4 w-4 text-slate-300" />
-                  <span>{course.duration}</span>
+              <p className="text-slate-300 leading-relaxed text-sm">{course.description}</p>
+              {course.imageUrl?.trim() ? (
+                <div className="rounded-xl overflow-hidden w-full mt-1 shadow-lg">
+                  <img
+                    src={course.imageUrl}
+                    alt={course.name}
+                    className="w-full object-cover"
+                    style={{ maxHeight: 320 }}
+                  />
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 rounded px-3 py-2">
-                  <GraduationCap className="h-4 w-4 text-slate-300" />
-                  <span>Government Recognized</span>
+              ) : (
+                <div className="rounded-xl bg-white/5 border border-white/10 w-full flex items-center justify-center" style={{ height: 200 }}>
+                  <BookOpen className="h-16 w-16 text-white/20" />
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Fees + CTA Card */}
-            <div className="bg-white text-slate-800 rounded-xl p-6 shadow-xl">
-              <div className="text-center mb-5">
-                <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Course Fee</p>
-                <p className="text-4xl font-bold text-[#1F3354] flex items-center justify-center gap-1">
-                  <IndianRupee className="h-7 w-7" />
-                  {course.fees.replace(/[₹,]/g, "")}
+            {/* ── Right — fees card ── */}
+            <div className="bg-white text-slate-800 rounded-xl shadow-xl overflow-hidden mt-16">
+              {/* Course meta strip */}
+              <div className="bg-slate-50 border-b border-slate-100 px-6 py-3 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  {course.duration}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <GraduationCap className="h-4 w-4 text-slate-400" />
+                  Government Recognized
+                </span>
+              </div>
+
+              <div className="p-6">
+                <div className="text-center mb-5">
+                  <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Course Fee</p>
+                  <p className="text-4xl font-bold text-[#1F3354] flex items-center justify-center gap-1">
+                    <IndianRupee className="h-7 w-7" />
+                    {course.fees.replace(/[₹,]/g, "")}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">One-time payment · All inclusive</p>
+                </div>
+
+                <ul className="space-y-2 mb-6">
+                  {features.slice(0, 4).map(f => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+
+                <a href="/contact" className="flex items-center justify-center gap-2 w-full rounded bg-red-600 hover:bg-red-700 text-white py-3 text-sm font-semibold transition-colors">
+                  Enroll Now — {course.fees} <ArrowRight className="h-4 w-4" />
+                </a>
+                <p className="text-center text-xs text-slate-400 mt-3">
+                  Visit our center or <a href="tel:08299121689" className="text-red-600 hover:underline">call 08299121689</a>
                 </p>
-                <p className="text-xs text-slate-400 mt-1">One-time payment · All inclusive</p>
               </div>
-
-              <ul className="space-y-2 mb-6">
-                {features.slice(0, 4).map(f => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> {f}
-                  </li>
-                ))}
-              </ul>
-
-              <a href="/contact" className="flex items-center justify-center gap-2 w-full rounded bg-red-600 hover:bg-red-700 text-white py-3 text-sm font-semibold transition-colors">
-                Enroll Now — {course.fees} <ArrowRight className="h-4 w-4" />
-              </a>
-              <p className="text-center text-xs text-slate-400 mt-3">
-                Visit our center or <a href="tel:08299121689" className="text-red-600 hover:underline">call 08299121689</a>
-              </p>
             </div>
+
           </div>
         </div>
       </section>

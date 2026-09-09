@@ -1,7 +1,8 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import ENote from "@/models/ENote";
+import { getCache, setCache } from "@/lib/cache";
 
 function serialize(doc: any) {
   return {
@@ -20,12 +21,16 @@ function serialize(doc: any) {
 
 export async function GET(req: Request) {
   try {
-    await connectDB();
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category") || "";
-    const access   = searchParams.get("access")   || "";   // "free" | "enrolled"
+    const access   = searchParams.get("access")   || "";
     const status   = searchParams.get("status")   || "";
-    const publicOnly = searchParams.get("public") === "1";
+    const publicOnly = searchParams.get("public") === "1" ? "1" : "";
+    const cacheKey = `enotes:${category}:${access}:${status}:${publicOnly}`;
+    const cached = getCache(cacheKey);
+    if (cached) return NextResponse.json(cached, { headers: { "X-Cache": "HIT", "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" } });
+
+    await connectDB();
 
     const filter: any = { deletedAt: { $exists: false } };
     if (publicOnly) filter.status = "active";
@@ -34,10 +39,13 @@ export async function GET(req: Request) {
     if (access && access !== "all") filter.accessType = access;
 
     const docs = await ENote.find(filter)
+      .select("title description courseCategory accessType fileUrl content order status")
       .sort({ courseCategory: 1, order: 1, createdAt: -1 })
       .lean();
 
-    return NextResponse.json({ success: true, data: docs.map(serialize) });
+    const payload = { success: true, data: docs.map(serialize) };
+    setCache(cacheKey, payload, 30_000);
+    return NextResponse.json(payload, { headers: { "X-Cache": "MISS", "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" } });
   } catch (err) {
     console.error("[GET enotes]", err);
     return NextResponse.json({ success: false, error: "Failed" }, { status: 500 });

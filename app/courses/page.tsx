@@ -26,10 +26,11 @@ const fallbackCourses = [
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>(fallbackCourses);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/courses?limit=50", { cache: "no-store" })
+    // Background refresh — show fallback instantly, no 3s spinner
+    fetch("/api/courses?limit=50")
       .then((r) => r.json())
       .then((j) => {
         if (j.success && j.data.length) {
@@ -45,22 +46,9 @@ export default function CoursesPage() {
             features: ["Government Certificate", "Expert Faculty", "Practical Training", "Placement Support"],
           })));
         }
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {});
   }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <SiteNav />
-        <div className="flex items-center justify-center py-20">
-          <div className="w-7 h-7 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-        </div>
-        <SiteFooter />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -107,7 +95,7 @@ export default function CoursesPage() {
               <div key={course.id} className="bg-white rounded-xl shadow-md shadow-gray-300/60 overflow-hidden hover:shadow-xl hover:shadow-gray-400/40 transition-all duration-200 border border-gray-200 flex flex-col">
                 <div className="w-full h-44 bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white overflow-hidden">
                   {course.imageUrl ? (
-                    <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover" />
+                    <img src={course.imageUrl} alt={course.title} className="w-full h-full object-cover" loading="lazy" />
                   ) : (
                     courseIcons[Number(String(course.id).slice(-1)) % 6 + 1] || <BookOpen className="w-14 h-14" />
                   )}

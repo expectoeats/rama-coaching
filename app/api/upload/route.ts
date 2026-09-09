@@ -13,13 +13,17 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Validate type
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!allowed.includes(file.type) && !file.type.startsWith("image/")) {
-      return NextResponse.json({ success: false, error: "Only images allowed" }, { status: 400 });
+    // Validate type — allow image + pdf + ppt for course content
+    const allowedImages = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const allowedDocs = ["application/pdf", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation"];
+    const isImage = allowedImages.includes(file.type) || file.type.startsWith("image/");
+    const isDoc = allowedDocs.includes(file.type);
+    if (!isImage && !isDoc) {
+      return NextResponse.json({ success: false, error: "Only images, PDF, PPT allowed" }, { status: 400 });
     }
-    if (buffer.length > 2 * 1024 * 1024) {
-      return NextResponse.json({ success: false, error: "Max 2MB" }, { status: 400 });
+    const maxSize = isDoc ? 20 * 1024 * 1024 : 2 * 1024 * 1024;
+    if (buffer.length > maxSize) {
+      return NextResponse.json({ success: false, error: isDoc ? "Max 20MB for PDF/PPT" : "Max 2MB" }, { status: 400 });
     }
 
     const uploadsDir = path.join(process.cwd(), "public", "uploads");

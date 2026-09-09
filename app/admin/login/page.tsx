@@ -6,7 +6,7 @@ import { Lock, Mail, Eye, EyeOff, LogIn } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@ramacoaching.com");
+  const [email, setEmail] = useState("ramainstitutetech@gmail.com");
   const [password, setPassword] = useState("Admin@123");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -65,14 +65,17 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="admin@ramacoaching.com"
+                placeholder="ramainstitutetech@gmail.com"
                 className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-navy/20 focus:border-navy outline-none text-sm"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-slate-700">Password</label>
+              <Link href="/forgot-password" className="text-xs font-medium text-[#1F3354] hover:underline">Forgot password?</Link>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -101,7 +104,7 @@ export default function AdminLoginPage() {
 
         <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-3">
           <p className="text-xs font-semibold text-slate-700 mb-1">Demo Credentials</p>
-          <p className="text-xs text-slate-600">Email: admin@ramacoaching.com</p>
+          <p className="text-xs text-slate-600">Email: ramainstitutetech@gmail.com</p>
           <p className="text-xs text-slate-600">Password: Admin@123</p>
         </div>
         <div className="mt-4 text-center">

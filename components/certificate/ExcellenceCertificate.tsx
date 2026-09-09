@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { CertificateData } from "@/types/certificate";
 import { LogoEmblem } from "./DocumentParts";
 import { InstitutionBadges } from "./InstitutionBadges";
@@ -7,6 +8,18 @@ const WIDTH = 794;
 const HEIGHT = 1123;
 
 export function ExcellenceCertificate({ data }: { data: CertificateData }) {
+  const [sigUrls, setSigUrls] = useState<{ sec: string; ctrl: string }>({ sec: "/signature.png", ctrl: "/signature.png" });
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" }).then(r=>r.json()).then(j=>{
+      if(j.success && j.data){
+        setSigUrls({
+          sec: j.data.secretarySignatureUrl || "/signature.png",
+          ctrl: j.data.controllerSignatureUrl || "/signature.png",
+        });
+      }
+    }).catch(()=>{});
+  }, []);
+
   const fields: { label: string; value: string }[] = [
     { label: "Name Of Student",       value: data.studentName },
     { label: "Father's Name",         value: data.fatherName },
@@ -119,13 +132,21 @@ export function ExcellenceCertificate({ data }: { data: CertificateData }) {
 
             <InstitutionBadges />
 
-            <div className="doc-flow-footer">
+            <div className="doc-flow-footer" style={{ position: "relative" }}>
               <div className="doc-footer-left">
                 <div>Dated : {data.dated || "—"}</div>
                 <div>Place : {data.place || "—"}</div>
               </div>
-              <div className="doc-footer-secretary">Secretary</div>
-              <div className="doc-footer-controller">Controller Of Examination</div>
+              <div className="doc-footer-secretary" style={{ textAlign: "center" }}>
+                <img src={sigUrls.sec} alt="Secretary Signature" style={{ width: 105, height: 38, objectFit: "contain", marginBottom: 1, display: "block", marginLeft: "auto", marginRight: "auto" }} onError={(e)=>{(e.currentTarget as HTMLImageElement).src="/signature.png";}} />
+                <span style={{ borderTop: "1px solid #000", paddingTop: 2, display: "inline-block", minWidth: 85, fontSize: 11 }}>Secretary</span>
+              </div>
+              <div className="doc-footer-controller" style={{ textAlign: "center" }}>
+                <img src={sigUrls.ctrl} alt="Controller Signature" style={{ width: 105, height: 38, objectFit: "contain", marginBottom: 1, display: "block", marginLeft: "auto", marginRight: "auto" }} onError={(e)=>{(e.currentTarget as HTMLImageElement).src="/signature.png";}} />
+                <span style={{ borderTop: "1px solid #000", paddingTop: 2, display: "inline-block", minWidth: 135, fontSize: 11 }}>Controller Of Examination</span>
+              </div>
+              {/* Stamp — center watermark */}
+              <img src="/stamp.png" alt="Stamp" style={{ position: "absolute", left: "50%", top: "52%", transform: "translate(-50%, -50%)", width: 140, height: 140, objectFit: "contain", pointerEvents: "none", opacity: 0.12 }} />
             </div>
           </div>
         </div>

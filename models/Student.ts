@@ -15,6 +15,8 @@ export interface IStudent extends Document {
   photoUrl?: string;
   passwordHash?: string;
   deletedAt?: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const StudentSchema = new Schema<IStudent>(
@@ -33,6 +35,8 @@ const StudentSchema = new Schema<IStudent>(
     photoUrl: { type: String, default: "" },
     passwordHash: { type: String, select: false },
     deletedAt: { type: Date },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
   },
   { timestamps: true }
 );

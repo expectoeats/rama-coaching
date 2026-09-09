@@ -40,6 +40,16 @@ function DRow({ label, value, mono }: { label: string; value?: string; mono?: bo
 
 // ── Franchise Certificate Print View ─────────────────────────────────────────
 function FranchiseCertView({ cert, app }: { cert: FranchiseCertificate; app: FranchiseApplication }) {
+  const [sig, setSig] = useState({ sec: "/signature.png", ctrl: "/signature.png", stamp: "/stamp.png" });
+  useEffect(() => {
+    fetch("/api/settings", { cache: "no-store" }).then(r=>r.json()).then(j=>{
+      if(j.success && j.data) setSig({
+        sec: j.data.secretarySignatureUrl || "/signature.png",
+        ctrl: j.data.controllerSignatureUrl || "/signature.png",
+        stamp: j.data.stampUrl || "/stamp.png",
+      });
+    }).catch(()=>{});
+  }, []);
   return (
     <div
       id="franchise-cert-print"
@@ -133,9 +143,11 @@ function FranchiseCertView({ cert, app }: { cert: FranchiseCertificate; app: Fra
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-end justify-between mt-6">
+        {/* Footer — with Signature & Stamp (dynamic from Settings) */}
+        <div className="relative flex items-end justify-between mt-8">
+          <img src={sig.stamp} alt="Stamp" className="absolute left-1/2 -translate-x-1/2 -top-6 w-20 h-20 object-contain pointer-events-none" onError={(e)=>{(e.currentTarget as HTMLImageElement).src="/stamp.png";}} />
           <div className="text-center">
+            <img src={sig.sec} alt="Secretary Signature" className="w-28 h-10 object-contain mx-auto mb-1" onError={(e)=>{(e.currentTarget as HTMLImageElement).src="/signature.png";}} />
             <div className="w-32 border-t border-gray-400 pt-1">
               <p className="text-xs text-gray-500">Authorized Signatory</p>
               <p className="text-xs font-medium text-gray-700">Secretary</p>
@@ -146,6 +158,7 @@ function FranchiseCertView({ cert, app }: { cert: FranchiseCertificate; app: Fra
             Verify at: rama-coaching.vercel.app/verification
           </div>
           <div className="text-center">
+            <img src={sig.ctrl} alt="Controller Signature" className="w-28 h-10 object-contain mx-auto mb-1" onError={(e)=>{(e.currentTarget as HTMLImageElement).src="/signature.png";}} />
             <div className="w-40 border-t border-gray-400 pt-1">
               <p className="text-xs text-gray-500">Controller of Examination</p>
               <p className="text-xs font-medium text-gray-700">Rama Coaching Center</p>

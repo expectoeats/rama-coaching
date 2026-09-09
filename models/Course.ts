@@ -10,6 +10,13 @@ export interface ICourse extends Document {
   imageUrl?: string;
   status: "active" | "inactive";
   deletedAt?: Date;
+  // Structured duration (for display + logic)
+  durationValue?: number;
+  durationUnit?: "week" | "month" | "year";
+  // Access expiry for student (after enroll)
+  accessValue?: number; // 0 = lifetime
+  accessUnit?: "week" | "month" | "year";
+  accessDays?: number; // computed, 0 = lifetime
 }
 
 const CourseSchema = new Schema<ICourse>(
@@ -23,6 +30,11 @@ const CourseSchema = new Schema<ICourse>(
     imageUrl: { type: String, default: "" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     deletedAt: { type: Date },
+    durationValue: { type: Number, default: null },
+    durationUnit: { type: String, enum: ["week", "month", "year"], default: null },
+    accessValue: { type: Number, default: 0 },
+    accessUnit: { type: String, enum: ["week", "month", "year"], default: "month" },
+    accessDays: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, Upload, Info } from "lucide-react";
+import { CheckCircle2, Upload, Info, PenTool } from "lucide-react";
 import { PageHeader, Card } from "@/components/ui/PageHeader";
 import { Tabs } from "@/components/ui/Tabs";
 import { Field, TextInput, TextArea } from "@/components/ui/Field";
+import { ImageUploadField } from "@/components/ui/ImageUploadField";
 // settings from API
 import type { InstituteSettings } from "@/data/types";
 
@@ -12,6 +13,7 @@ const TABS = [
   { key: "info", label: "Institute Information" },
   { key: "social", label: "Social Media" },
   { key: "website", label: "Website" },
+  { key: "signatures", label: "Signatures" },
 ];
 
 const URL_FIELDS: { key: keyof InstituteSettings; label: string }[] = [
@@ -24,11 +26,11 @@ const URL_FIELDS: { key: keyof InstituteSettings; label: string }[] = [
 export default function SettingsPage() {
   const [tab, setTab] = useState("info");
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState<InstituteSettings>({ instituteName: "", phone: "", email: "", address: "", website: "", facebook: "", instagram: "", youtube: "", linkedin: "", footerText: "" });
+  const [form, setForm] = useState<InstituteSettings>({ instituteName: "", phone: "", email: "", address: "", website: "", facebook: "", instagram: "", youtube: "", linkedin: "", footerText: "", secretarySignatureUrl: "", controllerSignatureUrl: "", stampUrl: "" });
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof InstituteSettings, string>>>({});
 
-  useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then(r=>r.json()).then(j=>{ if(j.success) { const d=j.data; setForm({ instituteName: d.instituteName||"", phone: d.phone||"", email: d.email||"", address: d.address||"", website: d.website||"", facebook: d.facebook||"", instagram: d.instagram||"", youtube: d.youtube||"", linkedin: d.linkedin||"", footerText: d.footerText||"" }); } }).finally(()=>setLoading(false)); }, []);
+  useEffect(() => { fetch("/api/settings", { cache: "no-store" }).then(r=>r.json()).then(j=>{ if(j.success) { const d=j.data; setForm({ instituteName: d.instituteName||"", phone: d.phone||"", email: d.email||"", address: d.address||"", website: d.website||"", facebook: d.facebook||"", instagram: d.instagram||"", youtube: d.youtube||"", linkedin: d.linkedin||"", footerText: d.footerText||"", secretarySignatureUrl: d.secretarySignatureUrl||"", controllerSignatureUrl: d.controllerSignatureUrl||"", stampUrl: d.stampUrl||"" }); } }).finally(()=>setLoading(false)); }, []);
 
   function update(key: keyof InstituteSettings, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -171,6 +173,38 @@ export default function SettingsPage() {
                   <Info className="h-3.5 w-3.5" />
                   Upload disabled in frontend demo
                 </p>
+              </div>
+            </div>
+          )}
+
+          {tab === "signatures" && (
+            <div className="space-y-6">
+              <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 flex items-start gap-2">
+                <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                <p className="text-xs text-amber-700 leading-relaxed">Ye signatures Certificate aur Marksheet pe ayenge. Marksheet me sirf <strong>Secretary</strong> ka signature dikhega, Certificate me <strong>Secretary + Controller</strong> dono. PNG transparent best hai.</p>
+              </div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <PenTool className="h-4 w-4 text-slate-600" />
+                    <label className="text-sm font-medium text-slate-700">Secretary Signature</label>
+                  </div>
+                  <ImageUploadField label="" value={form.secretarySignatureUrl || ""} onChange={(url) => setForm(prev => ({ ...prev, secretarySignatureUrl: url }))} />
+                  <p className="text-xs text-slate-500 mt-1">Marksheet + Certificate dono me dikhega</p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <PenTool className="h-4 w-4 text-slate-600" />
+                    <label className="text-sm font-medium text-slate-700">Controller Of Examination Signature</label>
+                  </div>
+                  <ImageUploadField label="" value={form.controllerSignatureUrl || ""} onChange={(url) => setForm(prev => ({ ...prev, controllerSignatureUrl: url }))} />
+                  <p className="text-xs text-slate-500 mt-1">Sirf Certificate me dikhega (Marksheet me nahi)</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-2 block">Stamp (Optional)</label>
+                <ImageUploadField label="" value={form.stampUrl || ""} onChange={(url) => setForm(prev => ({ ...prev, stampUrl: url }))} />
+                <p className="text-xs text-slate-500 mt-1">Certificate ke beech me watermark ke liye</p>
               </div>
             </div>
           )}

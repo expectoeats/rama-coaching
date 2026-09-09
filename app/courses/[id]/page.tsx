@@ -49,29 +49,65 @@ export default function CourseDetailPage() {
   const [enotes,  setEnotes]  = useState<ENote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState("");
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrolledStatus, setEnrolledStatus] = useState<string | null>(null);
+
+  const [testsLoading, setTestsLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const cRes = await fetch(`/api/courses/${id}`, { cache: "no-store" });
-        const cJ   = await cRes.json();
-        if (!cJ.success) { setError("Course not found."); setLoading(false); return; }
+        // Parallel: course + enrollment check (no category needed) — fastest first paint
+        const [cRes, meJson, enrJson] = await Promise.all([
+          fetch(`/api/courses/${id}`).then(r=>r.json()).catch(()=>null),
+          fetch(`/api/student/me`).then(r=>r.json()).catch(()=>null),
+          fetch(`/api/enrollments/my`).then(r=>r.json()).catch(()=>null),
+        ]);
+        if (!cRes?.success) { setError("Course not found."); setLoading(false); return; }
 
         const course: CourseDetail = {
-          id: cJ.data.id, name: cJ.data.name, description: cJ.data.description,
-          duration: cJ.data.duration, fees: cJ.data.fees,
-          category: cJ.data.category, accent: cJ.data.accent,
-          imageUrl: cJ.data.imageUrl || "",
+          id: cRes.data.id, name: cRes.data.name, description: cRes.data.description,
+          duration: cRes.data.duration, fees: cRes.data.fees,
+          category: cRes.data.category, accent: cRes.data.accent,
+          imageUrl: cRes.data.imageUrl || "",
         };
         setCourse(course);
+        setLoading(false); // show course header immediately — no 6s blank
 
-        // Load free mock tests + free notes for this course's category
-        const [tRes, nRes] = await Promise.all([
-          fetch(`/api/mock-tests?public=1&free=1&category=${encodeURIComponent(course.category)}&limit=6`, { cache: "no-store" }).then(r => r.json()),
-          fetch(`/api/enotes?public=1&access=free&category=${encodeURIComponent(course.category)}`, { cache: "no-store" }).then(r => r.json()),
-        ]);
-        if (tRes.success) setTests(tRes.data);
-        if (nRes.success) setEnotes(nRes.data);
+        // Load free mock tests + free notes for this course's category — in background
+        Promise.all([
+          fetch(`/api/mock-tests?public=1&free=1&category=${encodeURIComponent(course.category)}&limit=6`).then(r => r.json()).catch(()=>null),
+          fetch(`/api/enotes?public=1&access=free&category=${encodeURIComponent(course.category)}`).then(r => r.json()).catch(()=>null),
+        ]).then(([tRes, nRes]) => {
+          if (tRes?.success) setTests(tRes.data);
+          if (nRes?.success) setEnotes(nRes.data);
+          setTestsLoading(false);
+        });
+
+        // Check if already enrolled — use already fetched me/enr
+        try {
+          const meRes = meJson;
+          const enrRes = enrJson;
+          const meCourseId = meRes?.success ? String(meRes.data?.courseId || meRes.data?.id || "") : "";
+          // Student model has courseId not exposed via /api/student/me — fallback via courseName match
+          const meCourseName = meRes?.success ? String(meRes.data?.course || "") : "";
+          let enrolled = false;
+          let status: string | null = null;
+
+          // Primary course (student.course)
+          if (meCourseName && meCourseName.toLowerCase().trim() === course.name.toLowerCase().trim()) {
+            enrolled = true; status = "approved";
+          }
+          // Check Enrollments
+          if (enrRes?.success && Array.isArray(enrRes.data)) {
+            const found = enrRes.data.find((e: any) => String(e.courseId) === String(course.id) || String(e.courseName).toLowerCase() === course.name.toLowerCase());
+            if (found) { enrolled = true; status = found.status; }
+          }
+          // Also check raw student courseId if available
+          if (meCourseId && meCourseId === String(course.id)) { enrolled = true; status = "approved"; }
+
+          if (enrolled) { setIsEnrolled(true); setEnrolledStatus(status); }
+        } catch {}
       } catch { setError("Network error. Please try again."); }
       setLoading(false);
     }
@@ -168,9 +204,15 @@ export default function CourseDetailPage() {
                   ))}
                 </ul>
 
-                <a href="/contact" className="flex items-center justify-center gap-2 w-full rounded bg-red-600 hover:bg-red-700 text-white py-3 text-sm font-semibold transition-colors">
-                  Enroll Now — {course.fees} <ArrowRight className="h-4 w-4" />
-                </a>
+                {isEnrolled ? (
+                  <div className="w-full rounded bg-emerald-50 border-2 border-emerald-200 text-emerald-700 py-3 text-sm font-semibold flex items-center justify-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" /> Already Enrolled {enrolledStatus === "pending_verification" ? "— Pending" : ""}
+                  </div>
+                ) : (
+                  <Link href={`/enroll/${course.id}`} className="flex items-center justify-center gap-2 w-full rounded bg-red-600 hover:bg-red-700 text-white py-3 text-sm font-semibold transition-colors">
+                    Enroll Now — {course.fees} <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
                 <p className="text-center text-xs text-slate-400 mt-3">
                   Visit our center or <a href="tel:08299121689" className="text-red-600 hover:underline">call 08299121689</a>
                 </p>
@@ -196,8 +238,17 @@ export default function CourseDetailPage() {
         </div>
       </section>
 
-      {/* ── Free Trial Mock Tests ─────────────────────────────────────── */}
-      {tests.length > 0 && (
+      {/* ── Free Trial Mock Tests — skeleton while loading ───────────── */}
+      {testsLoading ? (
+        <section className="bg-white py-12">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="h-6 w-48 bg-slate-100 rounded animate-pulse mb-6" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[1,2,3].map(i=> <div key={i} className="rounded-xl border border-slate-200 bg-white p-5 animate-pulse"><div className="h-4 bg-slate-100 rounded w-3/4 mb-3"/><div className="h-3 bg-slate-50 rounded w-full mb-2"/><div className="h-8 bg-slate-100 rounded"/></div>)}
+            </div>
+          </div>
+        </section>
+      ) : tests.length > 0 && (
         <section className="bg-white py-12">
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex items-center justify-between mb-6">
@@ -217,7 +268,16 @@ export default function CourseDetailPage() {
       )}
 
       {/* ── Free E-Notes ─────────────────────────────────────────────── */}
-      {enotes.length > 0 && (
+      {testsLoading ? (
+        <section className="bg-slate-50 py-12">
+          <div className="mx-auto max-w-6xl px-6">
+            <div className="h-6 w-48 bg-slate-100 rounded animate-pulse mb-6" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1,2,3].map(i=> <div key={i} className="rounded-xl border border-violet-100 bg-white p-5 animate-pulse"><div className="h-4 bg-slate-100 rounded w-3/4 mb-3"/><div className="h-3 bg-slate-50 rounded w-full"/></div>)}
+            </div>
+          </div>
+        </section>
+      ) : enotes.length > 0 && (
         <section className="bg-slate-50 py-12">
           <div className="mx-auto max-w-6xl px-6">
             <div className="flex items-center justify-between mb-6">

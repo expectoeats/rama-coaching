@@ -11,6 +11,9 @@ export interface ISettings extends Document {
   youtube?: string;
   linkedin?: string;
   footerText?: string;
+  secretarySignatureUrl?: string;
+  controllerSignatureUrl?: string;
+  stampUrl?: string;
 }
 
 const SettingsSchema = new Schema<ISettings>(
@@ -25,6 +28,9 @@ const SettingsSchema = new Schema<ISettings>(
     youtube: { type: String },
     linkedin: { type: String },
     footerText: { type: String },
+    secretarySignatureUrl: { type: String, default: "" },
+    controllerSignatureUrl: { type: String, default: "" },
+    stampUrl: { type: String, default: "" },
   },
   { timestamps: true }
 );

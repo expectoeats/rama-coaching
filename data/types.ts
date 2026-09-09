@@ -169,4 +169,7 @@ export interface InstituteSettings {
   youtube: string;
   linkedin: string;
   footerText: string;
+  secretarySignatureUrl?: string;
+  controllerSignatureUrl?: string;
+  stampUrl?: string;
 }

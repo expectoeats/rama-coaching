@@ -1,7 +1,8 @@
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import MockTest from "@/models/MockTest";
+import { getCache, setCache } from "@/lib/cache";
 
 function serializeQuestion(q: any, stripAnswers = false) {
   const base: any = {
@@ -40,7 +41,6 @@ function serialize(doc: any, stripAnswers = false) {
 // ── GET list ──────────────────────────────────────────────────────────────────
 export async function GET(req: Request) {
   try {
-    await connectDB();
     const { searchParams } = new URL(req.url);
     const q          = searchParams.get("search")?.trim() || "";
     const status     = searchParams.get("status") || "";
@@ -48,6 +48,13 @@ export async function GET(req: Request) {
     const page  = Math.max(1, parseInt(searchParams.get("page")  || "1",  10));
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "50", 10)));
     const skip  = (page - 1) * limit;
+    const catParam = searchParams.get("category") || "";
+    const freeParam = searchParams.get("free") || "";
+    const cacheKey = `mock-tests:${q}:${status}:${publicOnly}:${catParam}:${freeParam}:${page}:${limit}`;
+    const cached = getCache(cacheKey);
+    if (cached) return NextResponse.json(cached, { headers: { "X-Cache": "HIT", "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" } });
+
+    await connectDB();
 
     const filter: any = { deletedAt: { $exists: false } };
     if (q) {
@@ -56,22 +63,23 @@ export async function GET(req: Request) {
     }
     if (status && status !== "all") filter.status = status;
     if (publicOnly) filter.status = "active";
-    const catParam = searchParams.get("category");
     if (catParam && catParam !== "all") filter.courseCategory = catParam;
-    if (searchParams.get("free") === "1") filter.isFree = true;
+    if (freeParam === "1") filter.isFree = true;
 
     const [items, total] = await Promise.all([
-      MockTest.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      MockTest.find(filter).select("title description subject courseCategory isFree duration totalMarks status").sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       MockTest.countDocuments(filter),
     ]);
 
     const data = items.map((doc) => serialize(doc, publicOnly));
 
-    return NextResponse.json({
+    const payload = {
       success: true,
       data,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    });
+    };
+    setCache(cacheKey, payload, 30_000);
+    return NextResponse.json(payload, { headers: { "X-Cache": "MISS", "Cache-Control": "public, s-maxage=30, stale-while-revalidate=60" } });
   } catch (err) {
     console.error("[GET mock-tests]", err);
     return NextResponse.json(

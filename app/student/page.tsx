@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Award, FileText, Eye, Printer, User, BookOpen, Calendar,
   NotebookText, ClipboardList, Clock, HelpCircle, ArrowRight,
-  Lock, ChevronRight, Globe,
+  Lock, ChevronRight, Globe, CheckCircle2,
 } from "lucide-react";
 import { CertificatePreview } from "@/components/certificate/CertificatePreview";
 import type { CertificateData } from "@/types/certificate";
@@ -24,32 +24,44 @@ export default function StudentDashboard() {
   const [marks,   setMarks]   = useState<any[]>([]);
   const [tests,   setTests]   = useState<MockTest[]>([]);
   const [enotes,  setEnotes]  = useState<ENote[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [coursesMeta, setCoursesMeta] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState<CertificateData | null>(null);
-  const [activeSection, setActiveSection] = useState<"certs" | "marks" | "tests" | "notes">("certs");
+  const [activeSection, setActiveSection] = useState<"courses" | "certs" | "marks" | "tests" | "notes">("courses");
+  const [focusCourse, setFocusCourse] = useState<string | null>(null);
+  const [focusLoading, setFocusLoading] = useState(false);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
-        const [meRes, cRes, mRes] = await Promise.all([
+        const [meRes, cRes, mRes, eRes] = await Promise.all([
           fetch("/api/student/me", { cache: "no-store" }),
           fetch("/api/student/certificates?type=excellence", { cache: "no-store" }),
           fetch("/api/student/certificates?type=marksheet", { cache: "no-store" }),
+          fetch("/api/enrollments/my", { cache: "no-store" }),
         ]);
         const meJ = await meRes.json();
         const cJ  = await cRes.json();
         const mJ  = await mRes.json();
+        const eJ  = await eRes.json();
+        if (eJ?.success) setEnrollments(eJ.data || []);
         if (meJ.success) {
           setStudent(meJ.data);
           const courseName = meJ.data?.course || meJ.data?.courseName || "";
-          const [tRes, nRes] = await Promise.all([
+          const [tRes, nRes, cMetaRes] = await Promise.all([
             fetch(`/api/mock-tests?public=1&limit=20&category=${encodeURIComponent(courseName)}`, { cache: "no-store" }).then(r => r.json()),
-            // Use authenticated student enotes API — shows enrolled + free notes
             fetch(`/api/student/enotes`, { cache: "no-store" }).then(r => r.json()),
+            fetch(`/api/courses`, { cache: "no-store" }).then(r => r.json()),
           ]);
           if (tRes.success) setTests(tRes.data);
           if (nRes.success) setEnotes(nRes.data);
+          if (cMetaRes?.success) {
+            const map: Record<string, any> = {};
+            cMetaRes.data.forEach((c: any) => { map[c.name] = c; map[String(c.id)] = c; map[String(c._id)] = c; });
+            setCoursesMeta(map);
+          }
         }
         if (cJ.success) setCerts(cJ.data);
         if (mJ.success) setMarks(mJ.data);
@@ -93,7 +105,39 @@ export default function StudentDashboard() {
     </div>
   );
 
+  // Helper to format expiry
+  function formatExpiry(expiresAt?: string | null, accessDays?: number, accessValue?: number, accessUnit?: string) {
+    if (!expiresAt && (!accessDays || accessDays === 0)) return "Lifetime Access";
+    if (!expiresAt && accessDays) return `Access: ${accessValue} ${accessUnit}${(accessValue||0)>1 ? "s" : ""}`;
+    if (!expiresAt) return null;
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return "Expired";
+    const days = Math.ceil(diff / (1000*60*60*24));
+    if (days <= 7) return `Expires in ${days} day${days>1?"s":""}`;
+    if (days <= 30) return `Expires in ${Math.ceil(days/7)} week${Math.ceil(days/7)>1?"s":""}`;
+    if (days <= 365) return `Expires in ${Math.ceil(days/30)} month${Math.ceil(days/30)>1?"s":""}`;
+    return `Expires in ${Math.ceil(days/365)} year${Math.ceil(days/365)>1?"s":""}`;
+  }
+
+  // My Courses = primary Student.course + approved enrollments (free ones) — with courseId for clickable link + expiry
+  const allCourses = (() => {
+    const map = new Map<string, { name: string; status: string; enrollmentId?: string; courseId?: string; course?: any; expiresAt?: string | null; accessDays?: number; accessValue?: number; accessUnit?: string }>();
+    if (student?.course) {
+      const meta = coursesMeta[student.course] || coursesMeta[student.courseId];
+      // For primary, no per-enrollment expiry — show course's access info
+      map.set(student.course, { name: student.course, status: "active", courseId: student.courseId, course: meta, expiresAt: null, accessDays: meta?.accessDays, accessValue: meta?.accessValue, accessUnit: meta?.accessUnit });
+    }
+    enrollments.forEach((e: any) => {
+      if (e.status === "expired") return; // hide expired
+      const meta = coursesMeta[e.courseName] || coursesMeta[String(e.courseId)];
+      if (e.status === "approved") map.set(e.courseName, { name: e.courseName, status: "approved", enrollmentId: e.enrollmentId, courseId: String(e.courseId), course: meta, expiresAt: e.expiresAt, accessDays: meta?.accessDays, accessValue: meta?.accessValue, accessUnit: meta?.accessUnit });
+      else if (e.status === "pending_verification") map.set(e.courseName + "_pending", { name: e.courseName, status: "pending", enrollmentId: e.enrollmentId, courseId: String(e.courseId), course: meta });
+    });
+    return Array.from(map.values());
+  })();
+
   const SECTIONS = [
+    { id: "courses", label: "My Courses",  icon: BookOpen,      count: allCourses.length, color: "text-emerald-600" },
     { id: "certs",  label: "Certificates", icon: Award,         count: certs.length,  color: "text-amber-600" },
     { id: "marks",  label: "Marksheets",   icon: FileText,      count: marks.length,  color: "text-blue-600"  },
     { id: "tests",  label: "Mock Tests",   icon: ClipboardList, count: tests.length,  color: "text-red-600"   },
@@ -119,7 +163,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* ── Section tabs + counts ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {SECTIONS.map(s => (
           <button key={s.id} type="button" onClick={() => setActiveSection(s.id as any)}
             className={`rounded-xl border p-4 text-left transition-all ${activeSection === s.id ? "border-navy bg-navy text-white shadow-md" : "bg-white border-slate-200 hover:border-slate-300"}`}>
@@ -131,6 +175,105 @@ export default function StudentDashboard() {
           </button>
         ))}
       </div>
+
+      {/* ── My Courses — human crafted, clickable ─────────────────────────── */}
+      {activeSection === "courses" && (
+        <div className="space-y-4">
+          <div className="flex items-end justify-between">
+            <div>
+              <h3 className="text-[15px] font-semibold text-slate-800 tracking-tight flex items-center gap-2"><BookOpen className="w-4 h-4 text-emerald-600" /> My Courses <span className="ml-1 text-xs font-normal text-slate-400">— {allCourses.length} enrolled</span></h3>
+              <p className="text-xs text-slate-500 mt-1 hidden sm:block">Tap a course to open materials, notes & tests.</p>
+            </div>
+            <Link href="/courses" className="text-xs font-medium text-slate-600 hover:text-emerald-700 flex items-center gap-1 border border-slate-200 rounded-full px-3 py-1.5 bg-white hover:bg-slate-50">Browse courses <ChevronRight className="w-3 h-3" /></Link>
+          </div>
+
+          {allCourses.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-3"><BookOpen className="w-6 h-6 text-slate-400" /></div>
+              <p className="text-sm font-medium text-slate-700">No courses yet</p>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">You haven&apos;t enrolled in any course. Explore our Government Recognized programs and start learning.</p>
+              <Link href="/courses" className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#1F3354] px-5 py-2 text-sm font-medium text-white hover:bg-[#162640]">Explore Courses <ArrowRight className="w-3.5 h-3.5" /></Link>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {allCourses.map((c, i) => {
+                const meta = c.course;
+                const courseHref = c.courseId ? `/courses/${c.courseId}` : `/courses?search=${encodeURIComponent(c.name)}`;
+                const learnHref = c.courseId ? `/student/course/${c.courseId}` : `/student`;
+                const isPending = c.status === "pending";
+                if (isPending) {
+                  // Pending — show enroll card, not clickable to learn
+                  return (
+                    <div key={i} className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-200 bg-white opacity-95">
+                      <div className="relative h-28 overflow-hidden bg-amber-50 flex items-center justify-center">
+                        {meta?.imageUrl ? <img src={meta.imageUrl} alt={c.name} className="h-full w-full object-cover opacity-60" /> : <BookOpen className="w-10 h-10 text-amber-300" />}
+                        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold border shadow-sm bg-amber-50 text-amber-700 border-amber-200"><span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Pending verification</span>
+                        {c.enrollmentId && <span className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[10px] font-mono border">{c.enrollmentId}</span>}
+                      </div>
+                      <div className="p-4">
+                        <p className="text-sm font-semibold text-slate-800">{c.name}</p>
+                        <p className="text-xs text-amber-700 mt-1">Payment verification pending — admin 2-4 hrs me approve karega. Tab tak Study nahi khulega.</p>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div key={i} className="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-md">
+                    {/* banner — now goes to LEARNING page, not enroll */}
+                    <Link href={learnHref} className="relative h-28 overflow-hidden bg-slate-50 block">
+                      {meta?.imageUrl ? (
+                        <img src={meta.imageUrl} alt={c.name} className="h-full w-full object-cover group-hover:scale-[1.02] transition-transform duration-500" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center" style={{ background: i % 2 === 0 ? "#f0fdf4" : "#fef3f2" }}>
+                          <BookOpen className={`w-10 h-10 ${i % 2 === 0 ? "text-emerald-300" : "text-red-300"}`} />
+                        </div>
+                      )}
+                      <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold border shadow-sm bg-emerald-50 text-emerald-700 border-emerald-200">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Enrolled — Active
+                      </span>
+                      {c.enrollmentId && <span className="absolute right-3 top-3 rounded-full bg-white/90 backdrop-blur px-2 py-1 text-[10px] font-mono text-slate-600 border border-slate-200">{c.enrollmentId}</span>}
+                    </Link>
+                    {/* body */}
+                    <div className="flex flex-1 flex-col p-4">
+                      <Link href={learnHref} className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2 hover:text-[#1F3354] hover:underline">{c.name}</Link>
+                      <p className="mt-1 text-xs text-slate-500 flex items-center gap-2">
+                        {meta?.duration && <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />{meta.duration}</span>}
+                        {meta?.category && <><span className="h-1 w-1 rounded-full bg-slate-300" />{meta.category}</>}
+                        {!meta?.duration && !meta?.category && <span className="inline-flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-emerald-500" /> Your learning</span>}
+                      </p>
+                      {(() => {
+                        const expText = formatExpiry(c.expiresAt, c.accessDays, c.accessValue, c.accessUnit);
+                        const isExpired = expText === "Expired";
+                        const isLifetime = expText === "Lifetime Access";
+                        return expText ? (
+                          <p className={`mt-1.5 inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border w-fit ${isExpired ? "bg-red-50 text-red-700 border-red-200" : isLifetime ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                            <Clock className="h-3 w-3" /> {expText}{c.expiresAt && !isLifetime && !isExpired ? ` • ${new Date(c.expiresAt).toLocaleDateString("en-IN", {day:"2-digit", month:"short", year:"numeric"})}` : ""}
+                          </p>
+                        ) : null;
+                      })()}
+                      <div className="mt-3 flex items-center gap-2">
+                        <Link href={learnHref} className="flex-1 inline-flex items-center justify-center gap-1 rounded-full bg-[#1F3354] px-3 py-2 text-xs font-semibold text-white hover:bg-[#162640]">▶ Start Learning <ArrowRight className="w-3 h-3" /></Link>
+                        <Link href={courseHref} className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-[#1F3354] border border-slate-200 rounded-full px-3 py-2 bg-white">Details</Link>
+                      </div>
+                      <p className="mt-2 text-center text-[11px] text-slate-400">Tap Start Learning — video / PDF / text inside</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {enrollments.filter((e:any)=>e.status==="pending_verification").length>0 && (
+            <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+              <p className="text-xs font-semibold text-amber-800 flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Pending — admin will verify in 2-4 hrs</p>
+              <div className="mt-2 space-y-1">
+                {enrollments.filter((e:any)=>e.status==="pending_verification").map((e:any)=>(
+                  <p key={e.id} className="text-xs text-amber-700">• {e.courseName} — {e.enrollmentId} <span className="text-amber-600">• UTR {e.utr.slice(0,8)}…</span></p>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Certificates ─────────────────────────────────────────────── */}
       {activeSection === "certs" && (
@@ -198,16 +341,17 @@ export default function StudentDashboard() {
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-semibold text-slate-800 flex items-center gap-2">
               <ClipboardList className="w-4 h-4 text-red-600" />
-              Mock Tests — {student?.course}
+              Mock Tests — {focusCourse || student?.course} {focusLoading && <span className="ml-2 h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-red-600" />}
             </h3>
-            <Link href="/mock-test" className="text-xs text-red-600 hover:underline flex items-center gap-1">
-              View all <ChevronRight className="w-3 h-3" />
-            </Link>
+            <div className="flex items-center gap-2">
+              {focusCourse && <button onClick={()=>{ setFocusCourse(null); setActiveSection("courses"); }} className="text-xs text-slate-500 hover:text-slate-700 border border-slate-200 rounded-full px-2 py-1">← Back</button>}
+              <Link href="/mock-test" className="text-xs text-red-600 hover:underline flex items-center gap-1">View all <ChevronRight className="w-3 h-3" /></Link>
+            </div>
           </div>
           {tests.length === 0 ? (
             <div className="px-5 py-10 text-center">
               <ClipboardList className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm text-slate-500 mb-3">No mock tests for {student?.course} yet.</p>
+              <p className="text-sm text-slate-500 mb-3">No mock tests for {focusCourse || student?.course} yet.</p>
               <Link href="/mock-test" className="inline-flex items-center gap-1.5 text-sm text-red-600 hover:underline">
                 Browse all tests <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -250,14 +394,17 @@ export default function StudentDashboard() {
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="font-semibold text-slate-800 flex items-center gap-2">
               <NotebookText className="w-4 h-4 text-violet-600" />
-              Study Notes — {student?.course}
+              Study Notes — {focusCourse || student?.course} {focusLoading && <span className="ml-2 h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-violet-600" />}
             </h3>
-            <span className="text-xs text-slate-500">{enotes.length} resources</span>
+            <div className="flex items-center gap-2">
+              {focusCourse && <button onClick={()=>{ setFocusCourse(null); }} className="text-xs text-slate-500 hover:text-slate-700 border border-slate-200 rounded-full px-2 py-1">← Back</button>}
+              <span className="text-xs text-slate-500">{enotes.length} resources</span>
+            </div>
           </div>
           {enotes.length === 0 ? (
             <div className="px-5 py-10 text-center">
               <NotebookText className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm text-slate-500">No study notes for {student?.course} yet.</p>
+              <p className="text-sm text-slate-500">No study notes for {focusCourse || student?.course} yet.</p>
               <p className="text-xs text-slate-400 mt-1">Check back soon — we add new material regularly.</p>
             </div>
           ) : (

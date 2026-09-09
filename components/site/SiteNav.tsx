@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   FileText, Users, Menu, X, MapPin, Phone, ClipboardList,
   NotebookText, BookOpen, ChevronDown, GraduationCap, Award,
-  ShieldCheck, ClipboardCheck,
+  ShieldCheck, ClipboardCheck, LogOut, LayoutDashboard,
 } from "lucide-react";
 
 // ── Dropdown config ───────────────────────────────────────────────────────────
@@ -39,16 +39,35 @@ export default function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [student, setStudent] = useState<{ fullName: string; photoUrl?: string; avatarColor?: string; rollNumber?: string } | null>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
   const dropRef = useRef<HTMLDivElement>(null);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  // Fetch logged-in student — deduped + cached (was 2x due to StrictMode + no-store)
+  useEffect(() => {
+    const cached = (window as any).__meCache;
+    if (cached) { if (cached.success) setStudent(cached.data); return; }
+    if ((window as any).__meFetching) return;
+    (window as any).__meFetching = true;
+    fetch("/api/student/me")
+      .then(r => r.json())
+      .then(j => { (window as any).__meCache = j; if (j.success && j.data) setStudent(j.data); })
+      .catch(()=>{})
+      .finally(()=>{ (window as any).__meFetching = false; });
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
     function handler(e: MouseEvent) {
       if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
         setActiveDropdown(null);
+      }
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
       }
     }
     document.addEventListener("mousedown", handler);
@@ -162,10 +181,37 @@ export default function SiteNav() {
 
           {/* Right side */}
           <div className="flex items-center gap-2 ml-4">
-            <Link href="/login" prefetch={true}
-              className="hidden lg:inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded font-medium text-[13px] whitespace-nowrap transition-colors">
-              <Users className="w-3.5 h-3.5" /> Student Login
-            </Link>
+            {student ? (
+              <div className="relative hidden lg:block" ref={profileRef}>
+                <button type="button" onClick={()=>setProfileOpen(v=>!v)} className="flex items-center gap-2 rounded-full border border-slate-200 bg-white pl-1 pr-3 py-1 hover:bg-slate-50 transition-colors">
+                  {student.photoUrl ? (
+                    <img src={student.photoUrl} alt={student.fullName} className="h-7 w-7 rounded-full object-cover border" />
+                  ) : (
+                    <span className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background: student.avatarColor || "#1F3354"}}>
+                      {student.fullName.split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase()}
+                    </span>
+                  )}
+                  <span className="text-sm font-medium text-slate-700 max-w-[110px] truncate">{student.fullName}</span>
+                  <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform ${profileOpen ? "rotate-180": ""}`} />
+                </button>
+                {profileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 shadow-lg rounded-xl overflow-hidden z-50">
+                    <div className="px-4 py-3 border-b border-slate-100">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{student.fullName}</p>
+                      <p className="text-xs text-slate-500 truncate">{student.rollNumber}</p>
+                    </div>
+                    <Link href="/student" onClick={()=>setProfileOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"><LayoutDashboard className="h-4 w-4" /> Dashboard</Link>
+                    <Link href="/student" onClick={()=>setProfileOpen(false)} className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"><GraduationCap className="h-4 w-4" /> My Courses</Link>
+                    <button onClick={async()=>{ await fetch("/api/auth/student/logout",{method:"POST"}); setStudent(null); setProfileOpen(false); window.location.href="/"; }} className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 border-t border-slate-100"><LogOut className="h-4 w-4" /> Logout</button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/login" prefetch={true}
+                className="hidden lg:inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded font-medium text-[13px] whitespace-nowrap transition-colors">
+                <Users className="w-3.5 h-3.5" /> Student Login
+              </Link>
+            )}
             <button type="button" aria-label="Toggle menu" onClick={() => setOpen(v => !v)}
               className="lg:hidden p-2 rounded text-gray-700 hover:text-red-600 hover:bg-gray-100">
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -236,10 +282,24 @@ export default function SiteNav() {
             </div>
 
             <div className="mt-auto px-4 pb-6 pt-3 border-t shrink-0">
-              <Link href="/login" prefetch={true} onClick={() => setOpen(false)}
-                className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded font-medium text-sm transition-colors">
-                <Users className="w-4 h-4" /> Student Login / Register
-              </Link>
+              {student ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+                    {student.photoUrl ? <img src={student.photoUrl} alt={student.fullName} className="h-8 w-8 rounded-full object-cover" /> : <span className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{background: student.avatarColor || "#1F3354"}}>{student.fullName.split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase()}</span>}
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-800 truncate">{student.fullName}</p>
+                      <p className="text-xs text-slate-500 truncate">{student.rollNumber}</p>
+                    </div>
+                  </div>
+                  <Link href="/student" prefetch={true} onClick={() => setOpen(false)} className="flex items-center justify-center gap-2 bg-[#1F3354] text-white px-4 py-2.5 rounded font-medium text-sm"><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
+                  <button onClick={async()=>{ await fetch("/api/auth/student/logout",{method:"POST"}); setStudent(null); setOpen(false); window.location.href="/"; }} className="w-full flex items-center justify-center gap-2 border border-red-200 text-red-600 px-4 py-2.5 rounded font-medium text-sm"><LogOut className="w-4 h-4" /> Logout</button>
+                </div>
+              ) : (
+                <Link href="/login" prefetch={true} onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded font-medium text-sm transition-colors">
+                  <Users className="w-4 h-4" /> Student Login / Register
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -38,20 +38,22 @@ export function CertificateShell({
             </svg>
           </div>
 
-          <div className="doc-content">
-            <svg className="doc-arch" viewBox="0 0 900 200" aria-hidden="true">
+          <div className="doc-content" style={{ overflow: "visible" }}>
+            <svg className="doc-arch" viewBox="0 0 920 200" aria-hidden="true" style={{ overflow: "visible", width: "100%", padding: "0 18px", boxSizing: "border-box" }}>
               <defs>
                 <path
                   id="archPath"
-                  d="M 50,185 A 420,165 0 0 1 850,185"
+                  d="M 45,185 A 470,185 0 0 1 875,185"
                   fill="none"
                 />
               </defs>
               <text
+                textLength="800"
+                lengthAdjust="spacing"
                 style={{
-                  fontSize: 45,
+                  fontSize: 46,
                   fontFamily: '"Old English Custom", "Old English Text MT", "UnifrakturMaguntia", "Cloister Black", "Engravers Old English", cursive, serif',
-                  fontWeight: "normal",
+                  fontWeight: "bold",
                   letterSpacing: "0.2px",
                 }}
                 fill="#000000"

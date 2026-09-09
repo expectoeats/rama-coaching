@@ -59,16 +59,18 @@ export function Marksheet({ data }: { data: CertificateData }) {
 
           <div className="doc-flow doc-flow-marks">
             <div className="doc-flow-top">
-              <div className="doc-flow-header doc-flow-header-marks">
-                <div className="doc-header-center">
+              <div className="doc-flow-header doc-flow-header-marks" style={{ overflow: "visible" }}>
+                <div className="doc-header-center" style={{ overflow: "visible" }}>
                   {/* Arched institution name — Mangalam College style: Old English Blackletter */}
-                  <svg className="doc-arch-flow" viewBox="0 0 900 200" aria-hidden="true">
+                  <svg className="doc-arch-flow" viewBox="0 0 920 200" aria-hidden="true" style={{ overflow: "visible", width: "100%", padding: "0 18px", boxSizing: "border-box" }}>
                     <defs>
-                      <path id="archPathMarks" d="M 50,185 A 420,165 0 0 1 850,185" fill="none" />
+                      <path id="archPathMarks" d="M 45,185 A 470,185 0 0 1 875,185" fill="none" />
                     </defs>
                     <text
+                      textLength="800"
+                      lengthAdjust="spacing"
                       style={{
-                        fontSize: 45,
+                        fontSize: 50,
                         fontFamily: '"Old English Custom", "Old English Text MT", "UnifrakturMaguntia", "Cloister Black", "Engravers Old English", cursive, serif',
                         fontWeight: "normal",
                         letterSpacing: "0.2px",
@@ -176,8 +178,8 @@ export function Marksheet({ data }: { data: CertificateData }) {
 
            
 
-            {/* Grade Legend — exact as reference image, single page fit */}
-            <div style={{ border: "1.2px solid #b91c1c", marginTop: 5, background: "white" }}>
+            {/* Grade Legend — half width, left aligned */}
+            <div style={{ border: "1.2px solid #b91c1c", marginTop: 5, background: "white", width: "52%", marginLeft: 0 }}>
               <div style={{ textAlign: "center", color: "#b91c1c", fontWeight: 700, fontSize: 10, padding: "2px 0", borderBottom: "1.2px solid #b91c1c", letterSpacing: "0.2px", lineHeight: 1.2 }}>
                 श्रेणियों का आख्यान GRADE LEGEND
               </div>

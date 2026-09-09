@@ -49,15 +49,17 @@ export function ExcellenceCertificate({ data }: { data: CertificateData }) {
 
           <div className="doc-flow">
             <div className="doc-flow-top">
-              <div className="doc-flow-header">
+              <div className="doc-flow-header" style={{ overflow: "visible" }}>
                 {/* Arched institution name — Mangalam College style: Old English Blackletter */}
-                <svg className="doc-arch-flow" viewBox="0 0 900 200" aria-hidden="true">
+                <svg className="doc-arch-flow" viewBox="0 0 920 200" aria-hidden="true" style={{ overflow: "visible", width: "100%", padding: "0 18px", boxSizing: "border-box" }}>
                   <defs>
-                    <path id="archPathFlow" d="M 50,185 A 420,165 0 0 1 850,185" fill="none" />
+                    <path id="archPathFlow" d="M 45,185 A 470,185 0 0 1 875,185" fill="none" />
                   </defs>
                   <text
+                    textLength="800"
+                    lengthAdjust="spacing"
                     style={{
-                      fontSize: 45,
+                      fontSize: 50,
                       fontFamily: '"Old English Custom", "Old English Text MT", "UnifrakturMaguntia", "Cloister Black", "Engravers Old English", cursive, serif',
                       fontWeight: "normal",
                       letterSpacing: "0.2px",
